@@ -6,6 +6,10 @@
 
 You can download binaries for Linux, macOS, and Windows [from itch.io](https://blinry.itch.io/oh-my-git)!
 
+In the **Play** level list, the extra **Beyond Git** reading sections (GitHub, GitLab, Gitea, Bitbucket + Jira, Azure DevOps) appear grouped at the bottom after the main Git tutorial chapters:
+
+![Level select: Beyond Git sections in the menu](images/readme-beyond-git-level-menu.png)
+
 ## ℹ️ A note on the maintenance status
 
 bleeptrack and blinry developed Oh My Git! in 2020/2021, with six months of funding from the Prototype Fund.

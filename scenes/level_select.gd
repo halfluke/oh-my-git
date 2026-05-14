@@ -60,12 +60,13 @@ func _append_levels_for_chapter(chapter, chapter_id):
 		
 		var badge = preload("res://scenes/cli_badge.tscn").instance()
 		hb.add_child(badge)
-		badge.active = slug in game.state["cli_badge"]
-		badge.sparkling = false
+		var read = game.state.get("freeroam_read", [])
+		badge.active = slug in game.state["cli_badge"] or slug in read
+		badge.sparkling = slug in game.state["cli_badge"]
 			
 		level_list.add_child(hb)
 		
-		if badge.active:
+		if slug in game.state["cli_badge"]:
 			game.notify("You get a golden badge for each level you solve without using the playing cards! Can you solve them all using the command line?", badge, "cli-badge")
 		level_id += 1
 

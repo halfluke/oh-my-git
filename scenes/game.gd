@@ -81,7 +81,7 @@ func copy_script_to_game_env(name):
 	global_shell.run("chmod u+x '%s'" % (tmp_prefix + name))
 	
 func _initial_state():
-	return {"history": [], "solved_levels": [], "received_hints": [], "cli_badge": [], "played_cards": []}
+	return {"history": [], "solved_levels": [], "received_hints": [], "cli_badge": [], "played_cards": [], "freeroam_read": []}
 	
 func save_state():
 	var savegame = File.new()
@@ -107,6 +107,9 @@ func load_state():
 	for key in new_state:
 		state[key] = new_state[key]
 	savegame.close()
+	
+	if not state.has("freeroam_read"):
+		state["freeroam_read"] = []
 	
 # filename is relative to the tmp directory!
 func create_file_in_game_env(filename, content):

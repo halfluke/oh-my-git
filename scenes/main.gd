@@ -91,8 +91,11 @@ func load_level(level_id):
 	level_name.text = level.title
 	
 	var slug = levels.chapters[game.current_chapter].slug + "/" + level.slug
-	$Menu/CLIBadge.active = slug in game.state["cli_badge"]
-	$Menu/CLIBadge.sparkling = false
+	_record_freeroam_visit_if_spine(slug)
+	var read = game.state.get("freeroam_read", [])
+	var cli_golden = slug in game.state["cli_badge"] or slug in read
+	$Menu/CLIBadge.active = cli_golden
+	$Menu/CLIBadge.sparkling = slug in game.state["cli_badge"]
 	
 	cards.draw(levels.chapters[game.current_chapter].levels[game.current_level].cards)
 	
@@ -250,6 +253,47 @@ func is_sandbox_chapter():
 const PLATFORM_THEORY_PREFIXES = ["github-", "gitlab-", "gitea-", "bitbucket-", "azure-devops-"]
 
 
+func _chapter_on_freeroam_spine(chapter):
+	if chapter.slug == "sandbox":
+		return true
+	for i in range(PLATFORM_THEORY_PREFIXES.size()):
+		if chapter.slug.begins_with(PLATFORM_THEORY_PREFIXES[i]):
+			return true
+	return false
+
+
+func _freeroam_spine():
+	var spine = []
+	for ci in range(levels.chapters.size()):
+		var ch = levels.chapters[ci]
+		if not _chapter_on_freeroam_spine(ch):
+			continue
+		for li in range(ch.levels.size()):
+			spine.append({"c": ci, "l": li})
+	return spine
+
+
+func _freeroam_spine_index():
+	var spine = _freeroam_spine()
+	var cc = game.current_chapter
+	var ll = game.current_level
+	for i in range(spine.size()):
+		if spine[i].c == cc and spine[i].l == ll:
+			return i
+	return -1
+
+
+func _record_freeroam_visit_if_spine(slug):
+	if _freeroam_spine_index() < 0:
+		return
+	if not game.state.has("freeroam_read"):
+		game.state["freeroam_read"] = []
+	if slug in game.state["freeroam_read"]:
+		return
+	game.state["freeroam_read"].append(slug)
+	game.save_state()
+
+
 func is_platform_theory_chapter():
 	var slug = levels.chapters[game.current_chapter].slug
 	for i in range(PLATFORM_THEORY_PREFIXES.size()):
@@ -259,32 +303,43 @@ func is_platform_theory_chapter():
 
 
 func uses_freeroam_nav():
-	return is_sandbox_chapter() or is_platform_theory_chapter()
+	return _freeroam_spine_index() >= 0
 
 
 func _update_freeroam_nav():
 	if uses_freeroam_nav():
 		sandbox_prev_button.visible = true
 		sandbox_next_button.visible = true
-		var n = levels.chapters[game.current_chapter].levels.size()
-		sandbox_prev_button.disabled = game.current_level <= 0
-		sandbox_next_button.disabled = game.current_level >= n - 1
-		if is_platform_theory_chapter():
-			sandbox_prev_button.hint_tooltip = "Previous page in this chapter"
-			sandbox_next_button.hint_tooltip = "Next page in this chapter"
-		else:
-			sandbox_prev_button.hint_tooltip = "Previous sandbox preset"
-			sandbox_next_button.hint_tooltip = "Next sandbox preset"
+		var spine = _freeroam_spine()
+		var idx = _freeroam_spine_index()
+		sandbox_prev_button.disabled = idx <= 0
+		sandbox_next_button.disabled = idx < 0 or idx >= spine.size() - 1
+		sandbox_prev_button.hint_tooltip = "Previous: sandbox & reading trail"
+		sandbox_next_button.hint_tooltip = "Next: sandbox & reading trail"
 	else:
 		sandbox_prev_button.visible = false
 		sandbox_next_button.visible = false
 
 
 func sandbox_prev():
-	if uses_freeroam_nav() and game.current_level > 0:
-		load_level(game.current_level - 1)
+	if not uses_freeroam_nav():
+		return
+	var spine = _freeroam_spine()
+	var idx = _freeroam_spine_index()
+	if idx <= 0:
+		return
+	var prev = spine[idx - 1]
+	game.current_chapter = prev.c
+	load_level(prev.l)
 
 
 func sandbox_next():
-	if uses_freeroam_nav() and game.current_level < levels.chapters[game.current_chapter].levels.size() - 1:
-		load_level(game.current_level + 1)
+	if not uses_freeroam_nav():
+		return
+	var spine = _freeroam_spine()
+	var idx = _freeroam_spine_index()
+	if idx < 0 or idx >= spine.size() - 1:
+		return
+	var nxt = spine[idx + 1]
+	game.current_chapter = nxt.c
+	load_level(nxt.l)
