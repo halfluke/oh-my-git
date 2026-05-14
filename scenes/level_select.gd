@@ -1,5 +1,14 @@
 extends Control
 
+# Section title, then slug prefix for chapters in that section (order preserved when listing).
+const PLATFORM_GROUPS = [
+	["Beyond Git: GitHub", "github-"],
+	["Beyond Git: GitLab", "gitlab-"],
+	["Beyond Git: Gitea", "gitea-"],
+	["Beyond Git: Bitbucket (+ Jira)", "bitbucket-"],
+	["Beyond Git: Azure DevOps", "azure-devops-"],
+]
+
 onready var level_list = $ScrollContainer/MarginContainer/Levels
 
 func _ready():
@@ -14,10 +23,19 @@ func back():
 	get_tree().change_scene("res://scenes/title.tscn")
 
 
-func _github_chapter_display_name(slug):
-	if not slug.begins_with("github-"):
+func _platform_prefix_for_slug(slug):
+	for g in range(PLATFORM_GROUPS.size()):
+		var pfx = PLATFORM_GROUPS[g][1]
+		if slug.begins_with(pfx):
+			return pfx
+	return ""
+
+
+func _platform_chapter_display_name(slug):
+	var pfx = _platform_prefix_for_slug(slug)
+	if pfx == "":
 		return slug
-	var rest = slug.substr(7)
+	var rest = slug.substr(pfx.length())
 	return rest.replace("-", " ").capitalize()
 
 
@@ -66,7 +84,7 @@ func reload():
 	
 	while i < n:
 		chapter = levels.chapters[i]
-		if chapter.slug.begins_with("github-"):
+		if _platform_prefix_for_slug(chapter.slug) != "":
 			break
 		var l = Label.new()
 		l.text = chapter.slug
@@ -76,19 +94,33 @@ func reload():
 		_append_levels_for_chapter(chapter, i)
 		i += 1
 	
-	if i < n:
-		var section = Label.new()
-		section.text = "Beyond Git: GitHub"
-		section.set("custom_fonts/font", big_font)
-		section.align = HALIGN_CENTER
-		level_list.add_child(section)
-		
-		while i < n:
-			chapter = levels.chapters[i]
+	if i >= n:
+		return
+	
+	var by_prefix = {}
+	for j in range(i, n):
+		var ch = levels.chapters[j]
+		var pfx = _platform_prefix_for_slug(ch.slug)
+		if pfx == "":
+			continue
+		if not by_prefix.has(pfx):
+			by_prefix[pfx] = []
+		by_prefix[pfx].append({"chapter_id": j, "chapter": ch})
+	
+	for g in range(PLATFORM_GROUPS.size()):
+		var section_title = PLATFORM_GROUPS[g][0]
+		var pfx = PLATFORM_GROUPS[g][1]
+		if not by_prefix.has(pfx):
+			continue
+		var sec = Label.new()
+		sec.text = section_title
+		sec.set("custom_fonts/font", big_font)
+		sec.align = HALIGN_CENTER
+		level_list.add_child(sec)
+		for item in by_prefix[pfx]:
 			var sub = Label.new()
-			sub.text = _github_chapter_display_name(chapter.slug)
+			sub.text = _platform_chapter_display_name(item.chapter.slug)
 			sub.set("custom_fonts/font", sub_font)
 			sub.align = HALIGN_CENTER
 			level_list.add_child(sub)
-			_append_levels_for_chapter(chapter, i)
-			i += 1
+			_append_levels_for_chapter(item.chapter, item.chapter_id)

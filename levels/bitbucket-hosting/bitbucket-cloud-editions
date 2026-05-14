@@ -1,0 +1,30 @@
+title = Bitbucket Cloud vs Data Center vs Server legacy
+mode = platform_theory
+
+[diagram]
+
+[code]
+   Bitbucket Cloud (Atlassian-hosted)
+        │                Data Center (self-managed cluster)
+        │                         │
+        ├───────────────┬──────────┴──────────┐
+        ▼               ▼                     ▼
+   fast iteration   enterprise HA        Server (EOL path)
+   marketplace apps compliance modes    migrate plans
+[/code]
+
+[center][color=#0052cc]Git[/color]  — same push/clone semantics across editions[/center]
+
+[description]
+
+[b]Bitbucket Cloud[/b] tracks Atlassian’s SaaS roadmap: integrated pipelines, native Jira links, and marketplace apps. Teams choose it when they already live in Atlassian ID and want low ops.
+
+[b]Bitbucket Data Center[/b] targets enterprises needing clustering, SAML, and data residency controls. Upgrade cadence and sizing guides differ from Cloud—capacity planning for Git storage and search indices matters.
+
+[b]Server end-of-life:[/b] many orgs migrated Server installs to Cloud or Data Center; if you inherit old docs, verify which edition they reference—API paths and features diverge.
+
+[b]Repositories and projects:[/b] Bitbucket groups repositories into [i]projects[/i] with permissions and hooks scoped per project or repo. Mirror GitHub’s org/repo mental model but read Atlassian’s permission names literally.
+
+[b]Pipelines vs external CI:[/b] Bitbucket Pipelines is YAML in-repo; you can also wire Bamboo, Jenkins, or GitHub Actions elsewhere via webhooks—avoid double-triggering builds.
+
+[b]Takeaway:[/b] edition choice is a compliance and billing decision; Git operations remain standard—focus migration risk on hooks, apps, and Jira field mappings.

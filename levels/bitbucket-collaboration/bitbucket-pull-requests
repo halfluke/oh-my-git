@@ -1,0 +1,30 @@
+title = Pull requests, branch permissions, and merge settings
+mode = platform_theory
+
+[diagram]
+
+[code]
+   feature branch
+         │
+         ▼
+   OPEN PULL REQUEST ──► reviewers / checks
+         │
+         │  branch permissions: who may merge?
+         │  merge strategies: merge / squash / fast-forward
+         ▼
+      main (protected)
+[/code]
+
+[center][color=#0052cc]minimum approvals · default reviewers[/color][/center]
+
+[description]
+
+Bitbucket [b]pull requests[/b] parallel other forges: diff, comments, tasks, and required builds before merge. [b]Branch permissions[/b] can restrict who pushes directly, who can merge, and whether fast-forward is required—combine with pipeline gates to prevent accidental history rewrites.
+
+[b]Fork vs branch workflows:[/b] public OSS often uses forks; internal orgs may use branch-only flows with strict default branch protection. Fork PRs still end as Git merges on the target.
+
+[b]Build status integration:[/b] pipelines publish build badges consumed by PRs; third-party CI can integrate via commit statuses if configured.
+
+[b]Large diffs:[/b] performance settings and shallow clones help reviewers; etiquette (smaller MRs) still dominates perceived velocity.
+
+[b]Takeaway:[/b] read Bitbucket’s merge checks as code+policy: Git proves the graph, Bitbucket enforces who may move protected refs.

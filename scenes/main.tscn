@@ -76,7 +76,7 @@ size_flags_horizontal = 3
 size_flags_stretch_ratio = 2.0
 custom_constants/separation = 8
 
-[node name="GithubTheoryPanel" type="VBoxContainer" parent="Rows/Columns/Repositories"]
+[node name="PlatformTheoryPanel" type="VBoxContainer" parent="Rows/Columns/Repositories"]
 visible = false
 anchor_right = 1.0
 anchor_bottom = 1.0
@@ -86,9 +86,19 @@ mouse_filter = 2
 size_flags_horizontal = 3
 size_flags_vertical = 3
 
-[node name="DiagramBody" type="RichTextLabel" parent="Rows/Columns/Repositories/GithubTheoryPanel"]
+[node name="DiagramTopMargin" type="MarginContainer" parent="Rows/Columns/Repositories/PlatformTheoryPanel"]
 margin_right = 1266.0
 margin_bottom = 782.0
+size_flags_horizontal = 3
+size_flags_vertical = 3
+custom_constants/margin_top = 96
+custom_constants/margin_left = 0
+custom_constants/margin_right = 0
+custom_constants/margin_bottom = 0
+
+[node name="DiagramBody" type="RichTextLabel" parent="Rows/Columns/Repositories/PlatformTheoryPanel/DiagramTopMargin"]
+anchor_right = 1.0
+anchor_bottom = 1.0
 rect_min_size = Vector2( 400, 400 )
 size_flags_horizontal = 3
 size_flags_vertical = 3

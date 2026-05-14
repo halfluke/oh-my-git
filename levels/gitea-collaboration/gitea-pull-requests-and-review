@@ -1,0 +1,27 @@
+title = Pull requests, review, and protected branches on Gitea
+mode = platform_theory
+
+[diagram]
+
+[code]
+   topic branch
+        │
+        ▼
+   PULL REQUEST  ──► reviewers · comments · labels
+        │
+        │  branch protection: required approvals?
+        ▼
+   merge into base (squash / merge / rebase per settings)
+[/code]
+
+[center][color=#00aa90]CODEOWNERS-style paths[/color]  (where enabled)  ·  [color=#00aa90]draft PR[/color][/center]
+
+[description]
+
+[b]Pull requests[/b] on Gitea mirror the familiar forge pattern: diff against base, threaded discussion, assignees, labels, and merge when checks pass. [b]Protected branches[/b] can require pull requests, disallow force-push, and require status checks—configuration depth varies by version, so read your release notes.
+
+[b]Reviews:[/b] comment on lines or whole files; approve or request changes depending on UI support in your version. Smaller PRs still beat giant blobs for latency and reviewer fatigue.
+
+[b]Draft / WIP:[/b] mark incomplete work so CI can run without implying merge readiness—naming conventions ([code]WIP:[/code] prefix) still appear in older instances.
+
+[b]Takeaway:[/b] collaboration on Gitea is intentionally simpler than mega-suite products—use webhooks and external tools when you outgrow built-in policy.

@@ -1,5 +1,5 @@
 title = Pull requests as the review and merge gate
-mode = github_theory
+mode = platform_theory
 
 [diagram]
 

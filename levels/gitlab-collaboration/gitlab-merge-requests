@@ -1,0 +1,35 @@
+title = Merge requests, approvals, and merge trains
+mode = platform_theory
+
+[diagram]
+
+[code]
+   feature branch ──► OPEN MR ──► review + pipeline
+                         │
+            ┌────────────┼────────────┐
+            ▼            ▼            ▼
+        approvals    discussions   MR pipelines
+            │            │            │
+            └────────────┴────────────┘
+                         ▼
+              merge (FF / merge commit / squash)
+                         │
+                         ▼
+                    target branch
+[/code]
+
+[center][color=#fca326]merge train[/color] (optional)  ·  serializes merges on a moving target[/center]
+
+[description]
+
+A [b]merge request[/b] is GitLab’s review and integration object: it references source and target branches, carries diffs, threads, approvals, and pipeline status. You can require approval rules by branch, code owners paths, or number of reviewers. [b]Draft[/b] MRs signal WIP; pushing new commits refreshes the diff and re-runs pipelines tied to the MR.
+
+[b]Merge strategies:[/b] fast-forward only, merge commit with or without semi-linear history, and squash merge mirror GitHub’s menu—policy is per project or inherited from the group. Squash commit messages can carry the MR title for readable history.
+
+[b]Merge trains:[/b] on busy default branches, trains queue MRs that passed pipeline on their tip, then validate each candidate against the hypothetical result of merging everything ahead in the train—reducing “green on branch, red after merge” surprises at the cost of latency and runner minutes.
+
+[b]Forking vs same-repo branches:[/b] GitLab supports both external forks (like GitHub) and in-repo feature branches with protected [code]main[/code]. Many internal teams skip forks entirely and rely on branch protections plus MR-only merges.
+
+[b]Security scans in MR widgets:[/b] SAST/dependency scanning can annotate the MR diff. Those results are product metadata; they do not change Git blob hashes.
+
+[b]Takeaway:[/b] MRs are where human policy meets the graph—learn branch protections, approval rules, and pipeline gates as one system.

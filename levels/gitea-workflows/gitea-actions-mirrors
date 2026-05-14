@@ -1,0 +1,34 @@
+title = Gitea Actions, mirrors, and outbound automation
+mode = platform_theory
+
+[diagram]
+
+[code]
+   push / schedule / workflow_dispatch
+              │
+              ▼
+        ┌─────────────┐
+        │ YAML jobs   │──► runners (labels match)
+        └──────┬──────┘
+               │
+     ┌─────────┴─────────┐
+     ▼                   ▼
+ artifacts/cache    webhooks POST
+                           │
+                           ▼
+                    external CI / chat / deployer
+[/code]
+
+[center][color=#00aa90]mirrors[/color]  ·  pull or push on cron  ·  keep forks warm[/center]
+
+[description]
+
+When Actions-style workflows are enabled, pipelines are YAML-driven similar in spirit to other platforms: jobs, steps, caches, and secrets scoped to the repo. [b]Runners[/b] must exist with matching labels; self-hosted runners are common on small installs to avoid trusting shared compute.
+
+[b]Mirrors vs Actions:[/b] mirroring solves “keep another copy of Git history fresh”; Actions solves “run commands when events happen.” You might combine both: mirror for HA, Actions for tests on the primary.
+
+[b]Webhooks:[/b] POST JSON payloads to your services on repository events—signature verification should be mandatory to prevent spoofed deliveries. Rate-limit outbound calls on tiny hardware.
+
+[b]Matrix builds:[/b] where supported, fan out across OS or Go versions like larger CI systems; watch total wall time on constrained runners.
+
+[b]Takeaway:[/b] treat outbound automation as part of your threat model—validate webhook sources, rotate tokens, and cap concurrent jobs so the host stays responsive for human developers.

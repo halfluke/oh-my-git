@@ -14,3 +14,15 @@ sandbox
 github-hosting
 github-collaboration
 github-workflows
+gitlab-hosting
+gitlab-collaboration
+gitlab-workflows
+gitea-hosting
+gitea-collaboration
+gitea-workflows
+bitbucket-hosting
+bitbucket-collaboration
+bitbucket-workflows
+azure-devops-hosting
+azure-devops-collaboration
+azure-devops-workflows

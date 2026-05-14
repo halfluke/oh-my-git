@@ -1,0 +1,28 @@
+title = Forks, mirrors, and merging across namespaces
+mode = platform_theory
+
+[diagram]
+
+[code]
+   canonical repo
+        │
+   fork │  (same forge or mirror from GitHub/GitLab)
+        ▼
+   contributor clone ──► PR to upstream
+        │
+        └──── mirror job keeps fork fresh (cron)
+[/code]
+
+[center][color=#00aa90]organization / team permissions[/color]  inherit like folders[/center]
+
+[description]
+
+[b]Forks[/b] duplicate refs and objects into another owner space so push access does not imply trust on the original repo. Gitea’s UI creates the fork and suggests remotes; Git operations match other forges.
+
+[b]Pull from upstream:[/b] merge or rebase upstream default into your fork’s default locally, or use the web “Sync” where available—conflicts resolve with normal Git tools.
+
+[b]Mirrors as collaboration aid:[/b] read-only mirrors of upstream can live beside active development repos; ensure issue trackers do not diverge confusingly between mirror and canonical.
+
+[b]Organizations:[/b] group repos and delegate admin; watch default visibility (public vs private) when repos move between orgs.
+
+[b]Takeaway:[/b] lightweight forges still need heavyweight habits: signed commits, small PRs, and explicit ownership of who may merge to production branches.

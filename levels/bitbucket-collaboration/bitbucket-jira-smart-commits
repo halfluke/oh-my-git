@@ -1,0 +1,28 @@
+title = Jira smart commits, issue keys, and PR ↔ ticket hygiene
+mode = platform_theory
+
+[diagram]
+
+[code]
+   commit message / PR description
+              │
+              │  PROJ-123 #comment fixed edge case
+              │  PROJ-123 #time 1h 30m
+              ▼
+        Jira automation (transitions, worklogs)
+              ▲
+              │  webhooks + OAuth app
+   Bitbucket PR merged ──► optional auto-close issue
+[/code]
+
+[center][color=#0052cc]dev panel[/color]  links branches · commits · builds[/center]
+
+[description]
+
+[b]Smart commits:[/b] embed Jira keys and verbs in Git messages so transitions fire on push—powerful and easy to typo. Document allowed verbs and train contributors; regex misconfiguration can move wrong tickets.
+
+[b]PR ↔ Jira:[/b] linking PRs to issues keeps QA and release notes coherent; branch policies can require a linked issue before merge in some setups.
+
+[b]Cross-product permissions:[/b] users need correct roles in both Bitbucket and Jira; “works in Git” but “missing in dev panel” is usually ACL or app link drift.
+
+[b]Takeaway:[/b] treat keys in messages as API calls—review them in CI if you need strict traceability for compliance.

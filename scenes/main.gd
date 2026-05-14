@@ -6,8 +6,8 @@ onready var terminal = $Rows/Controls/Terminal
 onready var input = terminal.input
 onready var output = terminal.output
 onready var repositories_node = $Rows/Columns/Repositories
-onready var github_theory_panel = $Rows/Columns/Repositories/GithubTheoryPanel
-onready var diagram_body = $Rows/Columns/Repositories/GithubTheoryPanel/DiagramBody
+onready var platform_theory_panel = $Rows/Columns/Repositories/PlatformTheoryPanel
+onready var diagram_body = $Rows/Columns/Repositories/PlatformTheoryPanel/DiagramTopMargin/DiagramBody
 var repositories = {}
 onready var next_level_button = $Menu/NextLevelButton
 onready var sandbox_prev_button = $Menu/SandboxPrevButton
@@ -78,13 +78,13 @@ func load_level(level_id):
 	var level = levels.chapters[game.current_chapter].levels[game.current_level]
 	level.construct()
 	
-	var gh = level.mode == "github_theory"
-	github_theory_panel.visible = gh
-	diagram_body.bbcode_text = level.diagram_bbcode if gh else ""
-	file_browser.visible = not gh
-	level_description.scroll_active = gh
-	level_description.fit_content_height = not gh
-	goals.visible = not gh
+	var pt = level.mode == "platform_theory"
+	platform_theory_panel.visible = pt
+	diagram_body.bbcode_text = level.diagram_bbcode if pt else ""
+	file_browser.visible = not pt
+	level_description.scroll_active = pt
+	level_description.fit_content_height = not pt
+	goals.visible = not pt
 	
 	level_description.bbcode_text = level.description[0]
 	level_congrats.bbcode_text = level.congrats
@@ -97,7 +97,7 @@ func load_level(level_id):
 	cards.draw(levels.chapters[game.current_chapter].levels[game.current_level].cards)
 	
 	for child in repositories_node.get_children():
-		if child.name == "GithubTheoryPanel":
+		if child.name == "PlatformTheoryPanel":
 			continue
 		child.queue_free()
 	repositories = {}
@@ -112,7 +112,7 @@ func load_level(level_id):
 		new_repo.label = repo.slug
 		new_repo.size_flags_horizontal = SIZE_EXPAND_FILL
 		new_repo.size_flags_vertical = SIZE_EXPAND_FILL
-		if gh:
+		if pt:
 			new_repo.visible = false
 		if new_repo.label == "yours":
 			file_browser.repository = new_repo
@@ -247,12 +247,19 @@ func is_sandbox_chapter():
 	return levels.chapters[game.current_chapter].slug == "sandbox"
 
 
-func is_github_theory_chapter():
-	return levels.chapters[game.current_chapter].slug.begins_with("github-")
+const PLATFORM_THEORY_PREFIXES = ["github-", "gitlab-", "gitea-", "bitbucket-", "azure-devops-"]
+
+
+func is_platform_theory_chapter():
+	var slug = levels.chapters[game.current_chapter].slug
+	for i in range(PLATFORM_THEORY_PREFIXES.size()):
+		if slug.begins_with(PLATFORM_THEORY_PREFIXES[i]):
+			return true
+	return false
 
 
 func uses_freeroam_nav():
-	return is_sandbox_chapter() or is_github_theory_chapter()
+	return is_sandbox_chapter() or is_platform_theory_chapter()
 
 
 func _update_freeroam_nav():
@@ -262,7 +269,7 @@ func _update_freeroam_nav():
 		var n = levels.chapters[game.current_chapter].levels.size()
 		sandbox_prev_button.disabled = game.current_level <= 0
 		sandbox_next_button.disabled = game.current_level >= n - 1
-		if is_github_theory_chapter():
+		if is_platform_theory_chapter():
 			sandbox_prev_button.hint_tooltip = "Previous page in this chapter"
 			sandbox_next_button.hint_tooltip = "Next page in this chapter"
 		else:

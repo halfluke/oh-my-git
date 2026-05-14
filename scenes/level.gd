@@ -8,7 +8,7 @@ var congrats
 var cards
 var repos = {}
 var tipp_level = 0
-# mode "git" (default) or "github_theory": reading pages, no win state; diagram + theory layout.
+# mode "git" (default) or "platform_theory": reading pages, no win state; diagram + theory layout.
 var mode = "git"
 var diagram_bbcode = ""
 
@@ -79,6 +79,8 @@ func load(path):
 			cards = []
 		
 		mode = config.get("mode", "git")
+		if mode == "github_theory":
+			mode = "platform_theory"
 		diagram_bbcode = _diagram_from_level_file(path)
 		if diagram_bbcode == "" and config.has("diagram"):
 			diagram_bbcode = config["diagram"]
@@ -136,7 +138,7 @@ func load(path):
 			
 			repos[repo].action_commands = config[k]
 				
-		if mode == "github_theory":
+		if mode == "platform_theory":
 			cards = []
 			if repos.empty():
 				repos["yours"] = LevelRepo.new()

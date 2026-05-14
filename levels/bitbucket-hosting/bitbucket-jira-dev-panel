@@ -1,0 +1,30 @@
+title = Bitbucket, Jira, and the “development panel” link
+mode = platform_theory
+
+[diagram]
+
+[code]
+   JIRA ISSUE  PROJ-123
+   ┌────────────────────────────┐
+   │ dev panel: branches · PRs  │◄──── smart commits / refs
+   │ build/deploy tabs          │
+   └────────────────────────────┘
+              ▲
+              │  webhooks + OAuth
+              │
+   BITBUCKET repo / pull requests
+[/code]
+
+[center][color=#0052cc][b]Atlassian[/b][/color]  identity + permissions bridge both products[/center]
+
+[description]
+
+[b]Bitbucket Cloud[/b] today sits inside the Atlassian cloud ecosystem next to Jira Software and Confluence. The [i]development panel[/i] on a Jira issue lists linked branches, commits, and pull requests from Bitbucket when integrations and permissions align—giving planners a view into engineering progress without opening Git directly.
+
+[b]Smart commits:[/b] commit messages may reference issues ([code]PROJ-123 #comment[/code] patterns) to transition workflow states—behavior is configurable and can surprise teams if regexes are too loose.
+
+[b]Jira alignment:[/b] issue keys in branch names are convention; real linkage comes from integration metadata and API calls. Keep naming discipline so automation does not attach the wrong issue.
+
+[b]Permissions coupling:[/b] Atlassian accounts, site access, and Bitbucket project permissions interact—debugging “can’t see PR in Jira” often traces to OAuth app scopes or user not having both product licenses.
+
+[b]Takeaway:[/b] treat Git as the source of truth for code, Jira as workflow truth for product intent, and Bitbucket as the bridge—when the bridge misconfigures, neither side lies, they just disagree.

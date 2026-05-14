@@ -1,0 +1,32 @@
+title = GitLab in one picture: product vs Git
+mode = platform_theory
+
+[diagram]
+
+[center][color=#8b949e]━━ same Git objects, different product shell ━━[/color][/center]
+
+[code]
+   YOUR LAPTOP                    GITLAB (SaaS or self-managed)
+   ┌─────────────┐               ┌─────────────────────────────┐
+   │ .git + tree │  push/fetch   │ bare repos + permissions    │
+   │ git merge   │◄────────────►│ Merge requests · Epics      │
+   └─────────────┘               │ CI/CD · Container registry  │
+                                 │ Wiki · Snippets · Pages     │
+                                 └─────────────────────────────┘
+[/code]
+
+[center][color=#fca326][b]GitLab[/b][/color]  ·  group → project → repo  ·  [color=#6b4fbb]DevSecOps[/color] bundle[/center]
+
+[description]
+
+[b]GitLab[/b] is a suite built around Git: the same commits, branches, and merges you already know, plus identity, CI/CD, container registry, security scanning, planning (issues, epics, milestones), and Kubernetes integration. You can use [b]GitLab.com[/b] (multi-tenant SaaS) or install [b]GitLab self-managed[/b] on your own infrastructure with the same feature set scaled to enterprise SSO and compliance.
+
+[b]Naming mental model:[/b] a [i]group[/i] is a folder of projects; a [i]project[/i] usually holds one default Git repository (plus optional linked repos in some setups). [i]Subgroups[/i] mirror org/team hierarchy. Permissions inherit downward like a filesystem—handy for large companies, easy to misconfigure if inheritance is ignored.
+
+[b]Merge requests (MRs):[/b] GitLab’s name for pull requests. Same social pattern: branch, push, open MR, review threads, pipelines must pass, merge when policy allows. The underlying wire protocol is still Git.
+
+[b]Why teams pick GitLab:[/b] single vendor for SCM + CI + registry + minimal app security basics; air-gapped self-managed option; sometimes cost or EU data residency. Trade-offs include heavier resource footprint than ultra-light hosts and a different UI vocabulary than GitHub.
+
+[b]Compared to GitHub Actions:[/b] both run YAML pipelines on events. GitLab CI is first-class in the same product ([code].gitlab-ci.yml[/code] at repo root or includes). Runner tokens, instance runners vs project runners, and executor types (shell, Docker, Kubernetes) are the sharp edges.
+
+[b]Takeaway:[/b] learn GitLab’s [i]objects[/i] (groups, projects, MRs, pipelines) the way you learned Git’s objects—then CLI and API clicks stay predictable.

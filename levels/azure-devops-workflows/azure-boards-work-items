@@ -1,0 +1,31 @@
+title = Boards: work items, backlogs, and sprints
+mode = platform_theory
+
+[diagram]
+
+[code]
+   Work item types: Epic · Feature · User Story · Bug · Task
+              │
+              ▼
+   Backlog views (priority ordering)
+              │
+              ▼
+   Sprint board (columns: New · Active · Resolved · Done)
+              │
+              ▼
+   linked to commits / PRs / builds (traceability)
+[/code]
+
+[center][color=#0078d4]queries · dashboards · notifications[/color][/center]
+
+[description]
+
+[b]Azure Boards[/b] tracks work items independently from Git, then links them via IDs, mentions, and branch policies. A [i]process template[/i] (Agile, Scrum, CMMI, or custom) defines work item types and transitions—changing templates later is painful, so choose deliberately at project creation.
+
+[b]Backlogs and boards:[/b] product backlogs order epics/features; sprint boards track iteration scope. Dragging cards updates state machines—ensure WIP limits and definitions of done are social agreements, not just UI columns.
+
+[b]Traceability:[/b] linking builds and commits to work items helps regulated industries; it also adds friction if developers must juggle IDs. Balance with templates and branch naming guidance.
+
+[b]Queries:[/b] WIQL (Work Item Query Language) powers saved queries and dashboards—treat complex queries like code: review and test them.
+
+[b]Takeaway:[/b] Boards describe intent; Git describes reality—use links and policies to keep them honest without drowning engineers in paperwork.

@@ -1,0 +1,24 @@
+title = Commit statuses, webhooks, and third-party CI glue
+mode = platform_theory
+
+[diagram]
+
+[code]
+   external CI (Jenkins, Circle, …)
+              │
+              └── REST: post commit status ──► PR widget
+              │
+   Bitbucket webhook POST
+              │
+              └── your listener ──► deploy / notify / gate
+[/code]
+
+[center][color=#0052cc]signatures · retries · idempotency[/color][/center]
+
+[description]
+
+Not every team uses Bitbucket Pipelines; many wire [b]commit statuses[/b] from external systems so PRs stay green/red consistently. Verify status context names so one pipeline does not clobber another.
+
+[b]Webhooks:[/b] validate payloads with shared secrets; handle duplicate deliveries; respond quickly to avoid Bitbucket retry storms.
+
+[b]Takeaway:[/b] glue code is part of the product—monitor webhook failure rates and alert before merges silently lose checks.

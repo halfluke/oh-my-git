@@ -1,0 +1,30 @@
+title = Permissions, mirroring, and day-to-day hosting on Gitea
+mode = platform_theory
+
+[diagram]
+
+[code]
+   org / user
+       │
+       ├── repo A  (unit: Git + issues + releases)
+       │      ├── branch protections
+       │      └── deploy keys (read-only / read-write)
+       │
+       └── mirror repo  ──►  upstream URL (pull/push modes)
+[/code]
+
+[center][color=#00aa90]LFS · attachments · release binaries[/color]  live beside Git storage[/center]
+
+[description]
+
+[b]Repository model:[/b] each repository has its own permission matrix: collaborators, teams, deploy keys, and branch/tag protection. Inherited org permissions reduce click-work but can accidentally grant broad access—review inheritance when repos move between owners.
+
+[b]Mirroring:[/b] Gitea can pull from or push to another Git remote on a schedule—useful for read-only mirrors of GitHub/GitLab sources or for fan-out to a public copy. Conflicts still resolve with normal Git rules; the mirror job only automates fetch/push.
+
+[b]Issues and kanban:[/b] lightweight boards attach to milestones; automation is simpler than Jira-sized products but enough for many OSS teams. Webhooks fire on push, issues, PR events for integration with chat or external CI.
+
+[b]Backups:[/b] snapshot the database plus repo bare paths and LFS/object storage. Test restore; Git-only mirrors are not sufficient if you care about issue text.
+
+[b]Scaling:[/b] horizontal scaling patterns differ by deployment; consult current docs for repository sharding and caching when many concurrent clones hit the same instance.
+
+[b]Takeaway:[/b] Gitea shines when ops burden must stay small—document your backup and upgrade path the day you install, not the day before an outage.
