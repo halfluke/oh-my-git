@@ -4,7 +4,7 @@
 
 ## Play the game!
 
-You can download binaries for Linux, macOS, and Windows [from itch.io](https://blinry.itch.io/oh-my-git)!
+This fork has no binaries, if you want to enjoy the changes install Godot 3, clone locally and execute godot3 project.godot from your repo path
 
 In the **Play** level list, the extra **Beyond Git** reading sections (GitHub, GitLab, Gitea, Bitbucket + Jira, Azure DevOps) appear grouped at the bottom after the main Git tutorial chapters:
 
