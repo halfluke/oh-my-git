@@ -41,7 +41,7 @@ __meta__ = {
 margin_left = 784.553
 margin_top = 702.517
 margin_right = 1136.55
-margin_bottom = 885.517
+margin_bottom = 925.517
 __meta__ = {
 "_edit_use_anchors_": false
 }
@@ -57,11 +57,23 @@ margin_right = 351.0
 margin_bottom = 83.0
 text = "Sandbox"
 
-[node name="Button2" type="Button" parent="VBoxContainer"]
+[node name="ResetProgressButton" type="Button" parent="VBoxContainer"]
 margin_top = 88.0
 margin_right = 351.0
 margin_bottom = 127.0
+text = "Reset progress"
+
+[node name="Button2" type="Button" parent="VBoxContainer"]
+margin_top = 132.0
+margin_right = 351.0
+margin_bottom = 171.0
 text = "Quit"
+
+[node name="ResetConfirm" type="ConfirmationDialog" parent="."]
+margin_right = 400.0
+margin_bottom = 88.0
+window_title = "Reset progress"
+dialog_text = "Clear all progress (solved levels, CLI badges, hints, and card history)? This cannot be undone."
 
 [node name="Sprite" type="Sprite" parent="."]
 
@@ -72,4 +84,6 @@ texture = ExtResource( 2 )
 
 [connection signal="pressed" from="VBoxContainer/Button" to="." method="levels"]
 [connection signal="pressed" from="VBoxContainer/Button3" to="." method="sandbox"]
+[connection signal="pressed" from="VBoxContainer/ResetProgressButton" to="." method="_on_reset_progress_pressed"]
 [connection signal="pressed" from="VBoxContainer/Button2" to="." method="quit"]
+[connection signal="confirmed" from="ResetConfirm" to="." method="_on_reset_confirm_confirmed"]

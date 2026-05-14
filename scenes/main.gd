@@ -8,6 +8,8 @@ onready var output = terminal.output
 onready var repositories_node = $Rows/Columns/Repositories
 var repositories = {}
 onready var next_level_button = $Menu/NextLevelButton
+onready var sandbox_prev_button = $Menu/SandboxPrevButton
+onready var sandbox_next_button = $Menu/SandboxNextButton
 onready var level_name = $Rows/Columns/RightSide/LevelInfo/LevelPanel/LevelName
 onready var level_description = $Rows/Columns/RightSide/LevelInfo/LevelPanel/Text/LevelDescription
 onready var level_congrats = $Rows/Columns/RightSide/LevelInfo/LevelPanel/Text/LevelCongrats
@@ -112,6 +114,7 @@ func load_level(level_id):
 	terminal.find_node("TextEditor").close()
 	
 	update_repos()
+	_update_sandbox_nav()
 	
 	# Unmute the audio after a while, so that player can hear pop sounds for
 	# nodes they create.
@@ -227,3 +230,29 @@ func new_tip():
 
 func back():
 	get_tree().change_scene("res://scenes/level_select.tscn")
+
+
+func is_sandbox_chapter():
+	return levels.chapters[game.current_chapter].slug == "sandbox"
+
+
+func _update_sandbox_nav():
+	if is_sandbox_chapter():
+		sandbox_prev_button.visible = true
+		sandbox_next_button.visible = true
+		var n = levels.chapters[game.current_chapter].levels.size()
+		sandbox_prev_button.disabled = game.current_level <= 0
+		sandbox_next_button.disabled = game.current_level >= n - 1
+	else:
+		sandbox_prev_button.visible = false
+		sandbox_next_button.visible = false
+
+
+func sandbox_prev():
+	if is_sandbox_chapter() and game.current_level > 0:
+		load_level(game.current_level - 1)
+
+
+func sandbox_next():
+	if is_sandbox_chapter() and game.current_level < levels.chapters[game.current_chapter].levels.size() - 1:
+		load_level(game.current_level + 1)

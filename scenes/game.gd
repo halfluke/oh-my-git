@@ -10,7 +10,6 @@ var used_cards = false
 
 var current_chapter = 0
 var current_level = 0
-var skipped_title = false
 
 var _file = "user://savegame.json"
 var state = {}
@@ -39,7 +38,6 @@ func _ready():
 #	helpers.crash(":)")
 
 	if global_shell.run("command -v git &>/dev/null && echo yes || echo no") == "no\n":
-		game.skipped_title = true
 		get_tree().change_scene("res://scenes/no_git.tscn")
 	else:
 		create_file_in_game_env(".gitconfig", helpers.read_file("res://scripts/gitconfig"))
@@ -91,6 +89,11 @@ func save_state():
 	savegame.open(_file, File.WRITE)
 	savegame.store_line(to_json(state))
 	savegame.close()
+
+
+func reset_progress():
+	state = _initial_state()
+	save_state()
 	
 func load_state():
 	var savegame = File.new()

@@ -276,6 +276,26 @@ text = "Next level"
 __meta__ = {
 "_edit_use_anchors_": false
 }
+
+[node name="SandboxPrevButton" type="Button" parent="Menu"]
+visible = false
+margin_left = 501.0
+margin_right = 628.0
+margin_bottom = 39.0
+focus_mode = 0
+enabled_focus_mode = 0
+text = "◀ Previous"
+hint_tooltip = "Previous sandbox preset"
+
+[node name="SandboxNextButton" type="Button" parent="Menu"]
+visible = false
+margin_left = 636.0
+margin_right = 763.0
+margin_bottom = 39.0
+focus_mode = 0
+enabled_focus_mode = 0
+text = "Next ▶"
+hint_tooltip = "Next sandbox preset"
 [connection signal="saved" from="Rows/Columns/RightSide/FileBrowser" to="." method="update_repos"]
 [connection signal="command_done" from="Rows/Controls/Terminal" to="." method="update_repos"]
 [connection signal="pressed" from="Menu/BackButton" to="." method="back"]
@@ -283,3 +303,5 @@ __meta__ = {
 [connection signal="pressed" from="Menu/CardsButton" to="." method="toggle_cards"]
 [connection signal="pressed" from="Menu/Tip!" to="." method="new_tip"]
 [connection signal="pressed" from="Menu/NextLevelButton" to="." method="load_next_level"]
+[connection signal="pressed" from="Menu/SandboxPrevButton" to="." method="sandbox_prev"]
+[connection signal="pressed" from="Menu/SandboxNextButton" to="." method="sandbox_next"]
