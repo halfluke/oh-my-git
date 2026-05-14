@@ -12,9 +12,12 @@ func on_survey_pressed():
 
 
 func sandbox():
-	game.current_chapter = levels.chapters.size() - 1
-	game.current_level = 0
-	get_tree().change_scene("res://scenes/main.tscn")
+	for i in range(levels.chapters.size()):
+		if levels.chapters[i].slug == "sandbox":
+			game.current_chapter = i
+			game.current_level = 0
+			get_tree().change_scene("res://scenes/main.tscn")
+			return
 
 
 func _on_reset_progress_pressed():

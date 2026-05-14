@@ -1,0 +1,52 @@
+title = GitHub Actions and automation on top of Git
+mode = github_theory
+
+[diagram]
+
+[center][color=#8b949e]event → workflow → runner[/color][/center]
+
+[code]
+   git push  refs/heads/main
+        │
+        ▼
+   GITHUB matches event in .github/workflows/*.yml
+        │
+        ├── job: unit-tests   (ubuntu runner)
+        │        npm test → publish JUnit → status check
+        │
+        └── job: docker-build (larger runner / self-hosted)
+                 buildx → push image (if secrets OK)
+[/code]
+
+[center][color=#79b8ff]YAML in repo[/color]  versioned like code · reviewed in PRs[/center]
+
+[code]
+   secrets (encrypted) ──► env at runtime only
+   environments        ──► approvals + protection rules
+[/code]
+
+[center][color=#7ee787]PR UI[/color] shows required checks before merge[/center]
+
+[description]
+
+[b]GitHub Actions[/b] is a CI/CD and general automation system triggered by [i]events[/i] on the repository: [code]push[/code], [code]pull_request[/code], [code]schedule[/code] (cron), [code]workflow_dispatch[/code] (manual), releases, issue comments, and many more. Workflows are YAML files under [code].github/workflows/[/code]. Because they live in Git, every change can go through the same review culture as application code.
+
+[b]Jobs and steps:[/b] a workflow contains one or more [i]jobs[/i] that run in parallel by default. Each job specifies a [i]runner[/i] (GitHub-hosted VM or your self-hosted agent) and an ordered list of [i]steps[/i]—either shell commands or reusable actions from the marketplace. Steps share the job’s workspace, which is a fresh clone of your repo (unless you customize checkout depth for speed).
+
+[b]How this relates to Git:[/b] Actions does not replace local Git hooks. A developer might still use [code]pre-commit[/code] for fast lint on their laptop; Actions proves the same commands on a clean environment every push. When a check fails, the PR stays unmergeable if branch protection says so—the Git objects already exist on the PR branch; policy simply blocks integrating them into [code]main[/code].
+
+[b]Secrets and contexts:[/b] repository and organization secrets are injected as environment variables or inputs to actions without being written into logs—when configured carefully. [b]Environments[/b] add optional manual approval gates, wait timers, and scoped secrets per deployment target (staging vs production).
+
+[b]Caching and artifacts:[/b] dependency caches speed up repeated runs; [i]artifacts[/i] retain build outputs (test reports, binaries) for later jobs or human download. Both are host storage, not Git objects.
+
+[b]Third-party actions supply chain:[/b] pinning actions to full commit SHAs instead of floating branch names reduces the risk of a tag being moved maliciously. Review action source like any dependency.
+
+[b]Self-hosted runners:[/b] useful for proprietary hardware or huge builds, but you inherit patching and trust: a compromised runner can exfiltrate secrets from workflows that target it.
+
+[b]Matrix builds and reuse:[/b] run the same job over a dimension (OS × Node version) to widen coverage; extract common steps into composite actions or reusable workflows to avoid YAML copy-paste drift.
+
+[b]Concurrency groups:[/b] cancel superseded runs when someone pushes again quickly—saves minutes and keeps status checks meaningful on the latest commit only.
+
+[b]Interaction with merge queue / merge group:[/b] some orgs run extra checks on a temporary integration branch GitHub creates when merging stacked PRs. Still Git refs—just orchestrated.
+
+[b]Takeaway:[/b] think “workflow YAML is program code, runners are machines, events are inputs.” Git records what shipped; Actions proves how it was tested before it shipped.

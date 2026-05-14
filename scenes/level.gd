@@ -8,6 +8,37 @@ var congrats
 var cards
 var repos = {}
 var tipp_level = 0
+# mode "git" (default) or "github_theory": reading pages, no win state; diagram + theory layout.
+var mode = "git"
+var diagram_bbcode = ""
+
+
+# helpers.parse() treats any line like [center] as a new [section], which strips BBCode from [diagram].
+# Read the diagram block from the raw file instead.
+func _diagram_from_level_file(path):
+	var body = helpers.read_file(path)
+	var tag = "[diagram]"
+	var pos = body.find(tag)
+	if pos < 0:
+		return ""
+	pos += tag.length()
+	while pos < body.length() and body.substr(pos, 1) in ["\r", "\n", " ", "\t"]:
+		pos += 1
+	var rest = body.substr(pos)
+	var cut = rest.length()
+	for marker in ["\n[description]", "\r\n[description]"]:
+		var j = rest.find(marker)
+		if j >= 0:
+			cut = min(cut, j)
+	for marker in ["\n[setup]", "\r\n[setup]"]:
+		var j = rest.find(marker)
+		if j >= 0:
+			cut = min(cut, j)
+	for marker in ["\n[win]", "\r\n[win]", "\n[congrats]", "\r\n[congrats]", "\n[actions]", "\r\n[actions]"]:
+		var j = rest.find(marker)
+		if j >= 0:
+			cut = min(cut, j)
+	return rest.substr(0, cut).strip_edges()
 
 
 # The path is an outer path.
@@ -46,6 +77,15 @@ func load(path):
 		cards = Array(config.get("cards", "").split(" "))
 		if cards == [""]:
 			cards = []
+		
+		mode = config.get("mode", "git")
+		diagram_bbcode = _diagram_from_level_file(path)
+		if diagram_bbcode == "" and config.has("diagram"):
+			diagram_bbcode = config["diagram"]
+		if diagram_bbcode != "":
+			var diagram_inline = RegEx.new()
+			diagram_inline.compile("`([^`]+)`")
+			diagram_bbcode = diagram_inline.sub(diagram_bbcode, "[code][color=#e1e160]$1[/color][/code]", true)
 		
 		var keys = config.keys()
 		var repo_setups = []
@@ -95,6 +135,12 @@ func load(path):
 				repo = "yours"
 			
 			repos[repo].action_commands = config[k]
+				
+		if mode == "github_theory":
+			cards = []
+			if repos.empty():
+				repos["yours"] = LevelRepo.new()
+				repos["yours"].setup_commands = "true"
 				
 #			for desc in repos[repo].win_conditions:
 #				print("Desc: " + desc)

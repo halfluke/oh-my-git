@@ -6,6 +6,8 @@ onready var terminal = $Rows/Controls/Terminal
 onready var input = terminal.input
 onready var output = terminal.output
 onready var repositories_node = $Rows/Columns/Repositories
+onready var github_theory_panel = $Rows/Columns/Repositories/GithubTheoryPanel
+onready var diagram_body = $Rows/Columns/Repositories/GithubTheoryPanel/DiagramBody
 var repositories = {}
 onready var next_level_button = $Menu/NextLevelButton
 onready var sandbox_prev_button = $Menu/SandboxPrevButton
@@ -73,9 +75,17 @@ func load_level(level_id):
 	
 	AudioServer.set_bus_mute(AudioServer.get_bus_index("SFX"), true)
 	
-	levels.chapters[game.current_chapter].levels[game.current_level].construct()
-
 	var level = levels.chapters[game.current_chapter].levels[game.current_level]
+	level.construct()
+	
+	var gh = level.mode == "github_theory"
+	github_theory_panel.visible = gh
+	diagram_body.bbcode_text = level.diagram_bbcode if gh else ""
+	file_browser.visible = not gh
+	level_description.scroll_active = gh
+	level_description.fit_content_height = not gh
+	goals.visible = not gh
+	
 	level_description.bbcode_text = level.description[0]
 	level_congrats.bbcode_text = level.congrats
 	level_name.text = level.title
@@ -84,13 +94,12 @@ func load_level(level_id):
 	$Menu/CLIBadge.active = slug in game.state["cli_badge"]
 	$Menu/CLIBadge.sparkling = false
 	
-	#if levels.chapters[game.current_chapter].levels[game.current_level].cards.size() == 0:
-	#	cards.redraw_all_cards()
-	#else:
 	cards.draw(levels.chapters[game.current_chapter].levels[game.current_level].cards)
 	
-	for r in repositories_node.get_children():
-		r.queue_free()
+	for child in repositories_node.get_children():
+		if child.name == "GithubTheoryPanel":
+			continue
+		child.queue_free()
 	repositories = {}
 	
 	var repo_names = level.repos.keys()
@@ -103,6 +112,8 @@ func load_level(level_id):
 		new_repo.label = repo.slug
 		new_repo.size_flags_horizontal = SIZE_EXPAND_FILL
 		new_repo.size_flags_vertical = SIZE_EXPAND_FILL
+		if gh:
+			new_repo.visible = false
 		if new_repo.label == "yours":
 			file_browser.repository = new_repo
 			file_browser.update()
@@ -114,7 +125,7 @@ func load_level(level_id):
 	terminal.find_node("TextEditor").close()
 	
 	update_repos()
-	_update_sandbox_nav()
+	_update_freeroam_nav()
 	
 	# Unmute the audio after a while, so that player can hear pop sounds for
 	# nodes they create.
@@ -236,23 +247,37 @@ func is_sandbox_chapter():
 	return levels.chapters[game.current_chapter].slug == "sandbox"
 
 
-func _update_sandbox_nav():
-	if is_sandbox_chapter():
+func is_github_theory_chapter():
+	return levels.chapters[game.current_chapter].slug.begins_with("github-")
+
+
+func uses_freeroam_nav():
+	return is_sandbox_chapter() or is_github_theory_chapter()
+
+
+func _update_freeroam_nav():
+	if uses_freeroam_nav():
 		sandbox_prev_button.visible = true
 		sandbox_next_button.visible = true
 		var n = levels.chapters[game.current_chapter].levels.size()
 		sandbox_prev_button.disabled = game.current_level <= 0
 		sandbox_next_button.disabled = game.current_level >= n - 1
+		if is_github_theory_chapter():
+			sandbox_prev_button.hint_tooltip = "Previous page in this chapter"
+			sandbox_next_button.hint_tooltip = "Next page in this chapter"
+		else:
+			sandbox_prev_button.hint_tooltip = "Previous sandbox preset"
+			sandbox_next_button.hint_tooltip = "Next sandbox preset"
 	else:
 		sandbox_prev_button.visible = false
 		sandbox_next_button.visible = false
 
 
 func sandbox_prev():
-	if is_sandbox_chapter() and game.current_level > 0:
+	if uses_freeroam_nav() and game.current_level > 0:
 		load_level(game.current_level - 1)
 
 
 func sandbox_next():
-	if is_sandbox_chapter() and game.current_level < levels.chapters[game.current_chapter].levels.size() - 1:
+	if uses_freeroam_nav() and game.current_level < levels.chapters[game.current_chapter].levels.size() - 1:
 		load_level(game.current_level + 1)

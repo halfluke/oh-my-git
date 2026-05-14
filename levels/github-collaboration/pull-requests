@@ -1,0 +1,49 @@
+title = Pull requests as the review and merge gate
+mode = github_theory
+
+[diagram]
+
+[center][color=#8b949e]── same repo or across forks ──[/color][/center]
+
+[code]
+  topic branch                    base branch
+  ●───●───●───●                        ●───●───●  main
+          \                           /
+           \   PULL REQUEST (host)   /
+            \←──────────────────────/
+             \  diff + conversation /
+              \   checks: ✓ ✓ ✗     /
+               \__________________/
+[/code]
+
+[center][color=#7ee787]review[/color]  ·  [color=#ffa657]CI status checks[/color]  ·  [color=#79b8ff]merge[/color] (merge / squash / rebase)[/center]
+
+[code]
+   states (simplified):  draft → ready → approved → merged
+                         ↑           ↑
+                    WIP signal   policy gates (branch protection)
+[/code]
+
+[description]
+
+A [b]pull request[/b] (PR) is a [i]host-level object[/i] that ties together: a source ref (branch on a repo), a target ref (usually the default branch), a computed diff, threaded discussion, review decisions, labels, milestone links, and CI results. GitLab calls the same idea a [b]merge request[/b]. Nothing in the Git CLI creates a PR; you use the website, [code]gh pr create[/code], or the REST or GraphQL APIs.
+
+[b]Why PRs exist:[/b] raw [code]git push[/code] to shared [code]main[/code] would let anyone rewrite history without ceremony. Teams instead require changes to arrive through a PR so there is a visible diff, a place for code review, and a hook for automation. The merge button (or merge queue) is the controlled point where Git objects become part of the blessed line of history.
+
+[b]Review mechanics:[/b] reviewers can comment on lines, files, or the whole PR. “Approve” and “Request changes” are GitHub-specific states that branch protection rules can require. Conversations can be resolved; maintainers may use “CODEOWNERS” files to auto-request domain experts when paths change.
+
+[b]Checks and branch protection:[/b] CI systems publish [i]status checks[/i] back to the PR. Branch protection can require: green checks, a minimum number of approvals, linear history, signed commits, or that the PR reference a linked issue. When a rule blocks merge, Git is not offended—the server simply refuses to fast-forward the protected ref.
+
+[b]Merge strategies (still Git underneath):[/b] [i]Create a merge commit[/i] adds a merge node with two parents. [i]Squash and merge[/i] builds one new commit on the base containing squashed changes from the whole branch (new author metadata depending on settings). [i]Rebase and merge[/i] replays commits onto the tip of base (new hashes unless identities preserved). Pick the policy your team wants for archaeology versus noise.
+
+[b]Draft PRs:[/b] signal “not ready for full review” while still running CI and sharing work-in-progress. Many teams open drafts early so bots run tests cheaper than on only local laptops.
+
+[b]Stacked / dependent PRs:[/b] advanced flows chain PR B on top of branch that only exists for PR A. GitHub does not always visualize that perfectly; discipline (small commits, clear titles) helps.
+
+[b]From Git’s perspective after merge:[/b] the PR is done—only commits remain. Release engineers therefore search logs and tags, not closed PR numbers, when they bisect production regressions—unless your culture embeds PR URLs in merge commit messages (a popular convention).
+
+[b]Merge queue and merge conflicts:[/b] some orgs require PRs to pass tests against a hypothetical merge result; GitHub may create temporary integration branches. If the base branch moves, press “Update branch” to merge or rebase base into your PR branch so CI sees a realistic graph.
+
+[b]Revert PRs:[/b] GitHub offers a button that creates a [i]new[/i] PR reverting a merged one via a revert commit—handy for hotfixes when you cannot rewrite public history.
+
+[b]Takeaway:[/b] treat the PR as the [i]contract[/i] between author and maintainers: intent, risk discussion, and machine proofs. Git remains the [i]ledger[/i] once the contract is executed.

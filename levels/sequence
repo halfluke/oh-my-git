@@ -11,3 +11,6 @@ bisect
 stash
 tags
 sandbox
+github-hosting
+github-collaboration
+github-workflows

@@ -1,0 +1,56 @@
+title = Clones, forks, and where collaboration lives
+mode = github_theory
+
+[diagram]
+
+[center][color=#8b949e]── canonical project ──[/color][/center]
+
+[code]
+   GITHUB   org/sweet  (upstream — you may lack push)
+        │
+        │  "Fork" button → copies repo to your account
+        ▼
+   GITHUB   you/sweet   (your fork — you have push)
+        │
+        │  git clone → laptop
+        ▼
+   LOCAL    origin → you/sweet    upstream → org/sweet
+[/code]
+
+[center][color=#79b8ff][b]Git[/b][/color]  clone · branch · commit · rebase · push[/center]
+
+[center][color=#f0883e][b]GitHub[/b][/color]  fork · open PR · request review · merge queue[/center]
+
+[code]
+   Pull Request:  you/sweet:feature  ─────►  org/sweet:main
+                         │
+              diff + comments + CI checks
+                         │
+              CODEOWNERS → auto-review requests
+[/code]
+
+[description]
+
+[b]Clone[/b] is a Git operation: you obtain a full (or partial) object database and a working tree, and you record where future [code]fetch[/code]/[code]push[/code] should talk. No fork is required if you already have read+write on the canonical remote.
+
+[b]Fork[/b] is a GitHub (host) operation: it duplicates repository data into a new namespace ([code]your-user/copied-repo[/code]) so you can [code]git push[/code] without write access to the original. The fork relationship is metadata used by the UI for PR defaults and for “sync fork” buttons; underneath you still have two independent sets of refs until you merge.
+
+[b]End-to-end social flow:[/b] (1) Fork on GitHub if you cannot push upstream. (2) Clone your fork; optionally add [code]upstream[/code]. (3) Create a topic branch locally. (4) Push that branch to [code]origin[/code]. (5) Open a PR from [code]origin:branch[/code] to [code]upstream:main[/code] (or whichever base the maintainers use). (6) Respond to review; push more commits; CI re-runs. (7) Maintainer merges; GitHub creates the merge commit or squash or rebase result on the base repo.
+
+[b]Why not email patches?[/b] Some communities still do; PRs win for traceability: every line comment stays attached to a diff revision, bots can label size and risk, and CI status is visible before merge. The cost is learning host UX on top of Git.
+
+[b]Permissions vocabulary:[/b] [i]read[/i] clone/fetch; [i]triage[/i] manage issues without code; [i]write[/i] push branches (often via PR from same repo); [i]maintain/admin[/i] change settings and protections. Forks sidestep upstream write by giving you admin on your copy.
+
+[b]Keeping up to date:[/b] [code]git fetch upstream[/code] then merge or rebase [code]upstream/main[/code] into your branch before you push, so the PR stays mergeable and review diff stays small. Conflicts are still resolved with normal Git tools.
+
+[b]Internal forks:[/b] some enterprises use “fork inside org” patterns for compliance. The graph looks the same; only the host’s permission model changes.
+
+[b]Bots and integrations:[/b] apps can open PRs as a machine user. From Git’s perspective it is just another ref update authorized by a token.
+
+[b]Contributor experience details:[/b] enable “Allow edits from maintainers” when you want upstream maintainers to push small fixes directly onto your PR branch—it is convenient but grants write access to that branch only. Always branch per feature so one stale PR does not block your fork’s [code]main[/code] from tracking upstream.
+
+[b]After merge:[/b] your fork’s default branch can lag; use “Sync fork” or fetch upstream and merge locally. Deleting the fork is optional; keep it if you expect more contributions.
+
+[b]Org-internal contributions:[/b] some teams skip forks: everyone pushes feature branches on the same repo and opens PRs within it. Permissions then rely on branch protection instead of fork boundaries.
+
+[b]Takeaway:[/b] the [i]social contract[/i] (who may push where) lives on GitHub; the [i]mathematics[/i] (commits, parents, merges) stays Git. Draw the remote lines on paper when you are lost—if the arrow cannot exist in Git, no button will fix it.
