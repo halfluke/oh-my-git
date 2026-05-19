@@ -9,18 +9,10 @@ func reload():
 	chapters = []
 	
 	var dir = DirAccess.open("res://levels")
-	dir.list_dir_begin() # TODOConverter3To4 fill missing arguments https://github.com/godotengine/godot/pull/40547
-
 	var chapter_names = []
-	
-	while true:
-		var file = dir.get_next()
-		if file == "":
-			break
-		elif not file.begins_with(".") and file != "sequence":
+	for file in dir.get_directories():
+		if not file.begins_with(".") and file != "sequence":
 			chapter_names.append(file)
-
-	dir.list_dir_end()
 	chapter_names.sort()
 	
 	var final_chapter_sequence = []

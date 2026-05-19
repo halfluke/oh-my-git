@@ -105,7 +105,7 @@ func run_async_thread(shell_command):
 		
 		shell_command.output = result["output"]
 		shell_command.exit_code = result["exit_code"]
-		shell_command.emit_signal("done")
+		shell_command.call_deferred("_emit_done")
 	
 func _shell_binary():
 	if _os == "Linux" or _os == "OSX":

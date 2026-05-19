@@ -7,9 +7,6 @@ func crash(message):
 	push_error(message)
 	print("FATAL ERROR: " + message)
 	get_tree().quit()
-	# Oh, still here? Let's crash more violently, by calling a non-existing method.
-	# Violent delights have violent ends.
-	get_tree().fatal_error()
 
 func map(array, object, f):
 	var new_array = []

@@ -13,16 +13,9 @@ func load(path):
 	
 	var level_names = []
 	var dir = DirAccess.open("res://levels/%s" % slug)
-	dir.list_dir_begin() # TODOConverter3To4 fill missing arguments https://github.com/godotengine/godot/pull/40547
-
-	while true:
-		var file = dir.get_next()
-		if file == "":
-			break
-		elif not file.begins_with(".") and file != "sequence":
+	for file in dir.get_files():
+		if not file.begins_with(".") and file != "sequence":
 			level_names.append(file)
-
-	dir.list_dir_end()
 	level_names.sort()
 	
 	var final_level_sequence = []

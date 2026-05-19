@@ -36,15 +36,14 @@ func _ready():
 		start_remote_shell()
 	global_shell = await new_shell()
 
-	if false:
-		if (await global_shell.run("command -v git &>/dev/null && echo yes || echo no")) == "no\n":
-			game.skipped_title = true
-			get_tree().change_scene_to_file("res://scenes/no_git.tscn")
-		else:
-			await create_file_in_game_env(".gitconfig", helpers.read_file("res://scripts/gitconfig"))
-			
-			await copy_script_to_game_env("fake-editor")
-			await copy_script_to_game_env("hint")
+	if (await global_shell.run("command -v git &>/dev/null && echo yes || echo no")) == "no\n":
+		game.skipped_title = true
+		get_tree().change_scene_to_file("res://scenes/no_git.tscn")
+	else:
+		await create_file_in_game_env(".gitconfig", helpers.read_file("res://scripts/gitconfig"))
+
+		await copy_script_to_game_env("fake-editor")
+		await copy_script_to_game_env("hint")
 
 func start_remote_shell():
 	var user_dir = ProjectSettings.globalize_path("user://")

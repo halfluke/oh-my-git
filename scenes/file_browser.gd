@@ -158,6 +158,8 @@ func item_deleted(item):
 	update()
 
 func close():
+	if not text_edit.visible:
+		return
 	text_edit.hide()
 	emit_signal("saved")
 	

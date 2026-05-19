@@ -89,10 +89,13 @@ func send_command(command):
 	command = editor_regex.sub(command, "fake-editor ")
 
 	shell.cd(repository.path)
-	
-	var cmd = shell.run_async_web(command, false)
-	await cmd.done
-	call_deferred("command_done", cmd)
+	var output = await shell.run(command, false)
+
+	var cmd = ShellCommand.new()
+	cmd.command = command
+	cmd.output = output
+	cmd.exit_code = shell.exit_code
+	command_done(cmd)
 
 func command_done(cmd):
 	if cmd.exit_code == 0:
@@ -221,4 +224,5 @@ func editor_saved():
 
 func close_all_editors():
 	for editor in get_tree().get_nodes_in_group("editors"):
-		editor.close()
+		if editor.has_method("close"):
+			editor.close()

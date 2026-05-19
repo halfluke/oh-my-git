@@ -62,9 +62,11 @@ func draw(ids):
 func arrange_cards():
 	var t = Timer.new()
 	t.wait_time = 0.05
+	t.one_shot = true
 	add_child(t)
 	t.start()
 	await t.timeout
+	t.queue_free()
 	
 	var amount_cards = get_tree().get_nodes_in_group("cards").size()
 	var total_angle = min(35, 45.0/7*amount_cards)

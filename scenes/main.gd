@@ -43,19 +43,6 @@ func _ready():
 	# Load current level.
 	load_level(game.current_level)
 	input.grab_focus()
-	
-func _process(delta):
-#	if _hint_server.is_connection_available():
-#		_hint_client_connection = _hint_server.take_connection()
-#		var length = _hint_client_connection.get_u32()
-#		var message = _hint_client_connection.get_string(length)
-#		game.notify(message)
-#	if game.used_cards:
-#		$Menu/CLIBadge.impossible = true
-		
-	# Magic height number to fix a weird rescaling bug that affected
-	# the Rows height. 
-	$Rows.size.y = 1064
 
 func load_chapter(id):
 	game.current_chapter = id
@@ -116,11 +103,12 @@ func load_level(level_id):
 	# nodes they create.
 	var t = Timer.new()
 	t.wait_time = 1
+	t.one_shot = true
 	add_child(t)
 	t.start()
 	await t.timeout
+	t.queue_free()
 	AudioServer.set_bus_mute(AudioServer.get_bus_index("SFX"), false)
-	# FIXME: Need to clean these up when switching levels somehow.
 	
 #	chapter_select.select(game.current_chapter)
 #	level_select.select(game.current_level)
@@ -145,6 +133,7 @@ func show_win_status(win_states):
 	var win_text = "\n\n"
 	for child in goals.get_children():
 		child.queue_free()
+	await get_tree().process_frame
 	for state in win_states:
 		var b = Label.new()
 		b.text = state
@@ -206,7 +195,7 @@ func show_win_status(win_states):
 
 func update_repos():
 	var win_states = await levels.chapters[game.current_chapter].levels[game.current_level].check_win()
-	show_win_status(win_states)
+	await show_win_status(win_states)
 	
 	for r in repositories:
 		var repo = repositories[r]

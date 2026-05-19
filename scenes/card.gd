@@ -146,7 +146,7 @@ func dropped_on(other):
 
 func try_play(full_command):
 	if game.energy >= energy:
-		var terminal = $"../../../..".terminal
+		var terminal = get_tree().get_current_scene().terminal
 		terminal.send_command(full_command)
 		#yield(terminal, "command_done")
 		game.used_cards = true
