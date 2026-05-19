@@ -3,7 +3,7 @@
 [ext_resource type="Script" path="res://scenes/repository.gd" id="1"]
 [ext_resource type="Theme" uid="uid://d2e7phm6ufj2i" path="res://styles/theme.tres" id="2"]
 [ext_resource type="FontFile" path="res://fonts/big.tres" id="3"]
-[ext_resource type="PackedScene" path="res://scenes/drop_area.tscn" id="4"]
+[ext_resource type="PackedScene" uid="uid://bbr48crw0hyp3" path="res://scenes/drop_area.tscn" id="4"]
 
 [node name="Repository" type="Control"]
 clip_contents = true

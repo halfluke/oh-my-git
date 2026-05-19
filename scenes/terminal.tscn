@@ -38,31 +38,36 @@ mouse_filter = 1
 script = ExtResource("4")
 
 [node name="Rows" type="VBoxContainer" parent="."]
-layout_mode = 0
+layout_mode = 1
+anchors_preset = 15
 anchor_right = 1.0
 anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
 
 [node name="TopHalf" type="Control" parent="Rows"]
 layout_mode = 2
 size_flags_vertical = 3
 
 [node name="Output" type="RichTextLabel" parent="Rows/TopHalf"]
-layout_mode = 0
+layout_mode = 1
+anchors_preset = 15
 anchor_right = 1.0
 anchor_bottom = 1.0
-offset_top = -1.92206
-offset_bottom = -1.92212
-size_flags_vertical = 3
+grow_horizontal = 2
+grow_vertical = 2
 theme_override_fonts/normal_font = ExtResource("3")
 theme_override_styles/normal = SubResource("1")
 scroll_following = true
 
 [node name="Completions" type="Tree" parent="Rows/TopHalf"]
-layout_mode = 0
+layout_mode = 1
+anchors_preset = 12
 anchor_top = 1.0
 anchor_right = 1.0
 anchor_bottom = 1.0
-offset_top = -34.0
+offset_top = -210.0
+grow_horizontal = 2
 columns = 2
 hide_root = true
 
@@ -102,12 +107,21 @@ syntax_highlighter = null
 [node name="TCPServer" parent="." instance=ExtResource("6")]
 
 [node name="Pager" type="Window" parent="."]
+title = "Command output"
+initial_position = 1
+size = Vector2i(960, 720)
+visible = false
+exclusive = false
 
 [node name="Text" type="RichTextLabel" parent="Pager"]
+layout_mode = 1
 anchors_preset = 15
 anchor_right = 1.0
 anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
 theme_override_fonts/normal_font = ExtResource("3")
+scroll_following = true
 
 [node name="ErrorSound" type="AudioStreamPlayer" parent="."]
 stream = ExtResource("7")

@@ -31,6 +31,12 @@ func _ready():
 	
 	completions.hide()
 	history_position = game.state["history"].size()
+	$Pager.hide()
+	$Pager.close_requested.connect(_on_pager_close_requested)
+
+func _on_pager_close_requested():
+	$Pager.hide()
+	input.grab_focus()
 
 func _input(event):
 	if not input.has_focus():
@@ -109,8 +115,8 @@ func command_done(cmd):
 		output.text = output.text + "$ " + cmd.command + "\n" + cmd.output
 		game.notify("This is your terminal! All commands are executed here, and you can see their output. You can also type your own commands here!", self, "terminal")
 	else:
-		$Pager/Text.text = cmd.output
-		$Pager.popup()
+		$Pager/Text.text = "$ " + cmd.command + "\n" + cmd.output
+		$Pager.popup_centered()
 	
 	emit_signal("command_done_signal")
 	
