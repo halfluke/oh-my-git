@@ -9,7 +9,7 @@ func _ready():
 func _mouse_entered(_area):
 	hovered = true
 	var tween = get_tree().create_tween()
-	tween.tween_property($Highlight/Sprite2D.material, "shader_param/hovered",1,0.1)
+	tween.tween_property($Highlight/Sprite2D.material, "shader_parameter/hovered", 1, 0.1)
 	#tween.interpolate_property($Highlight/Sprite2D.material, "shader_param/hovered", 0, 1, 0.1, Tween.TRANS_CUBIC, Tween.EASE_IN_OUT)
 	#add_child(tween)
 	#tween.start()
@@ -17,7 +17,7 @@ func _mouse_entered(_area):
 func _mouse_exited(_area):
 	hovered = false
 	var tween = get_tree().create_tween()
-	tween.tween_property($Highlight/Sprite2D.material, "shader_param/hovered", 0, 0.1)
+	tween.tween_property($Highlight/Sprite2D.material, "shader_parameter/hovered", 0, 0.1)
 
 	
 func _input(event):

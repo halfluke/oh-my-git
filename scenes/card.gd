@@ -56,9 +56,9 @@ func _unhandled_input(event):
 			if "[string]" in command:
 				var dialog = preload("res://scenes/input_dialog.tscn").instantiate()
 				add_child(dialog)
+				dialog.entered.connect(entered_string)
+				dialog.canceled.connect(move_back)
 				dialog.popup_centered()
-				dialog.connect("entered", Callable(self, "entered_string"))
-				dialog.connect("popup_hide", Callable(self, "move_back"))
 				hide()
 			elif "[" in command:
 				move_back()
@@ -146,9 +146,6 @@ func dropped_on(other):
 
 func try_play(full_command):
 	if game.energy >= energy:
-		var terminal = get_tree().get_current_scene().terminal
-		terminal.send_command(full_command)
-		#yield(terminal, "command_done")
 		game.used_cards = true
 		$PlaySound.play()
 		var particles = preload("res://scenes/card_particles.tscn").instantiate()
@@ -160,6 +157,8 @@ func try_play(full_command):
 			game.state["played_cards"].push_back(id)
 			game.save_state()
 			$Panel/Glow.hide()
+		var terminal = get_tree().get_current_scene().terminal
+		terminal.send_command(full_command)
 	else:
 		move_back()
 

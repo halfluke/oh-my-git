@@ -36,12 +36,12 @@
     },
     {
         "id": "commit-a",
-        "command": "git commit -a",
+        "command": "git commit -a -m [string]",
         "description": "Make a new commit, after automatically adding all changes to the index.\nYou'll be asked to enter a short description of what you changed."
     },
     {
         "id": "commit-auto",
-        "command": "git add .; git commit",
+        "command": "git add .; git commit -m [string]",
         "description": "Make a new commit containing your current environment! Type in a description of what changed!"
     },
     {
@@ -136,7 +136,7 @@
     },
     {
         "id": "commit",
-        "command": "git commit",
+        "command": "git commit -m [string]",
         "description": "Make a commit from the current index."
     },
     {

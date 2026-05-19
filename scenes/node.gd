@@ -6,6 +6,7 @@ var type : set = type_set
 var repository: Control
 
 @onready var content_label = $Content/ContentLabel
+@onready var pop_sound = $Pop
 
 var children = {}: set = children_set
 var id_always_visible = false
@@ -18,9 +19,10 @@ func _ready():
 	content_set(content)
 	type_set(type)
 	id_set(id)
-	if not repository.simplified_view or (type != "tree" and type != "blob"):
-		$Pop.pitch_scale = randf_range(0.8, 1.2)
-		$Pop.play()
+	if repository and (not repository.simplified_view or (type != "tree" and type != "blob")):
+		if pop_sound:
+			pop_sound.pitch_scale = randf_range(0.8, 1.2)
+			pop_sound.play()
 
 func _process(delta):
 	if held:

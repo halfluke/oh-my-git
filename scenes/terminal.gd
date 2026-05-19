@@ -11,6 +11,8 @@ var git_commands_help = []
 @onready var input = $Rows/InputLine/Input
 @onready var output = $Rows/TopHalf/Output
 @onready var completions = $Rows/TopHalf/Completions
+@onready var ok_sound = $OkSound
+@onready var error_sound = $ErrorSound
 var repository
 @onready var main = get_tree().get_root().get_node("Main")
 
@@ -93,20 +95,28 @@ func send_command(command):
 	command = editor_regex.sub(command, "fake-editor ")
 
 	repository.shell.cd(repository.path)
-	var output = await repository.shell.run(command, false)
+	var shell_cmd = repository.shell.run_async(command, false)
+	await shell_cmd.done
+	if shell_cmd.thread:
+		shell_cmd.thread.wait_to_finish()
 
 	var cmd = ShellCommand.new()
 	cmd.command = command
-	cmd.output = output
-	cmd.exit_code = repository.shell.exit_code
-	command_done(cmd)
+	cmd.output = shell_cmd.output
+	cmd.exit_code = shell_cmd.exit_code
+	repository.shell.exit_code = shell_cmd.exit_code
+	call_deferred("command_done", cmd)
 
 func command_done(cmd):
+	if not is_inside_tree():
+		return
 	if cmd.exit_code == 0:
-		$OkSound.pitch_scale = randf_range(0.8, 1.2)
-		$OkSound.play()
+		if ok_sound:
+			ok_sound.pitch_scale = randf_range(0.8, 1.2)
+			ok_sound.play()
 	else:
-		$ErrorSound.play()
+		if error_sound:
+			error_sound.play()
 	
 	input.text = ""
 	input.editable = true

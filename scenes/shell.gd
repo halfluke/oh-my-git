@@ -35,6 +35,18 @@ func run_async_web(command, crash_on_fail=true):
 	run_async_thread(shell_command)
 	return shell_command
 
+func run_async(command, crash_on_fail=true):
+	var shell_command = ShellCommand.new()
+	shell_command.command = command
+	shell_command.crash_on_fail = crash_on_fail
+	var thread = Thread.new()
+	shell_command.thread = thread
+	thread.start(Callable(self, "_run_in_thread").bind(shell_command))
+	return shell_command
+
+func _run_in_thread(shell_command):
+	run_async_thread(shell_command)
+
 func run_async_thread(shell_command):
 	var command = shell_command.command
 	var crash_on_fail = shell_command.crash_on_fail
