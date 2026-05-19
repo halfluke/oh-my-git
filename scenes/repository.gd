@@ -14,7 +14,7 @@ var type = "remote"
 
 var node = preload("res://scenes/node.tscn")
 
-var shell = await game.new_shell()
+var shell = null
 var objects = {}
 var mouse_inside = false
 var has_been_layouted = false
@@ -28,6 +28,10 @@ var there_is_a_git_cache
 var _commit_count = 0
 
 func _ready():
+	if shell == null:
+		shell = await game.new_shell()
+	if path != "":
+		shell.cd(path)
 	# Trigger these again because nodes were not ready before.
 	set_label(label)
 	set_simplified_view(simplified_view)
@@ -71,8 +75,8 @@ func set_path(new_path):
 	if path_node:
 		path_node.text = path
 	if new_path != "":
-		print("CD-ing repo shell to " + new_path)
-		shell.cd(new_path)
+		if shell:
+			shell.cd(new_path)
 		for o in objects.values():
 			o.queue_free()
 		objects = {}
@@ -103,7 +107,7 @@ func update_objects():
 	for o in all_objects_cache:
 		if objects.has(o):
 			continue
-			
+
 		var type = await object_type(o)
 
 		if simplified_view:
@@ -112,7 +116,7 @@ func update_objects():
 
 		var n = node.instantiate()
 		n.id = o
-		n.type = await object_type(o)
+		n.type = type
 		n.content = await object_content(o)
 		n.repository = self
 	

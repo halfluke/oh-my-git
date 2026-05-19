@@ -16,6 +16,7 @@ var _file = "user://savegame.json"
 var state = {}
 
 var mutex
+var shell_environment_ready = false
 
 func get_tmp_prefix():
 	if OS.get_name() == "Web":
@@ -34,7 +35,10 @@ func _ready():
 	
 	if OS.get_name() == "Windows":
 		start_remote_shell()
+	DirAccess.make_dir_recursive_absolute(tmp_prefix + "repos")
+	shell_environment_ready = true
 	global_shell = await new_shell()
+	await global_shell.run("rm -f '%scommand'* 2>/dev/null || true" % tmp_prefix)
 
 	if (await global_shell.run("command -v git &>/dev/null && echo yes || echo no")) == "no\n":
 		game.skipped_title = true

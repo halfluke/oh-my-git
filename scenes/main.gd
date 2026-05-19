@@ -2,6 +2,9 @@ extends Control
 
 var dragged = null
 
+var _update_repos_busy = false
+var _update_repos_again = false
+
 @onready var terminal = $Rows/Controls/Terminal
 @onready var input = terminal.input
 @onready var output = terminal.output
@@ -57,7 +60,7 @@ func load_level(level_id):
 	
 	AudioServer.set_bus_mute(AudioServer.get_bus_index("SFX"), true)
 	
-	levels.chapters[game.current_chapter].levels[game.current_level].construct()
+	await levels.chapters[game.current_chapter].levels[game.current_level].construct()
 
 	var level = levels.chapters[game.current_chapter].levels[game.current_level]
 	level_description.text = level.description[0]
@@ -89,8 +92,7 @@ func load_level(level_id):
 		new_repo.size_flags_vertical = SIZE_EXPAND_FILL
 		if new_repo.label == "yours":
 			file_browser.repository = new_repo
-			file_browser.update()
-		repositories_node.add_child(new_repo)		
+		repositories_node.add_child(new_repo)
 		repositories[r] = new_repo
 	
 	terminal.repository = repositories[repo_names[repo_names.size()-1]]
@@ -194,14 +196,26 @@ func show_win_status(win_states):
 #	chapter_select.select(game.current_chapter)
 
 func update_repos():
+	if _update_repos_busy:
+		_update_repos_again = true
+		return
+	_update_repos_busy = true
+	while true:
+		_update_repos_again = false
+		await _update_repos_impl()
+		if not _update_repos_again:
+			break
+	_update_repos_busy = false
+
+func _update_repos_impl():
 	var win_states = await levels.chapters[game.current_chapter].levels[game.current_level].check_win()
 	await show_win_status(win_states)
-	
+
 	for r in repositories:
 		var repo = repositories[r]
 		await repo.update_everything()
 	await file_browser.update()
-	
+
 	input.grab_focus()
 
 func toggle_cards():

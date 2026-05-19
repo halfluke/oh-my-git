@@ -39,13 +39,77 @@ func clear():
 		
 func substr2(s):
 	return s.substr(2)
+
+func _collect_file_statuses(files: Array, wd_files: Array) -> Dictionary:
+	var statuses = {}
+	var wd_set = {}
+	for f in wd_files:
+		wd_set[f] = true
+
+	for f in files:
+		statuses[f] = {
+			"exists_in_wd": wd_set.has(f),
+			"exists_in_index": false,
+			"exists_in_head": false,
+			"wd_hash": "",
+			"index_hash": "",
+			"head_hash": "",
+			"conflict": false,
+		}
+
+	if not repository.there_is_a_git_cache:
+		return statuses
+
+	var index_raw = await repository.shell.run("git ls-files -s")
+	for line in index_raw.split("\n"):
+		if line == "":
+			continue
+		var parts = line.split(" ", false, 3)
+		if parts.size() < 4:
+			continue
+		var path = parts[3]
+		if not statuses.has(path):
+			continue
+		statuses[path]["exists_in_index"] = true
+		if statuses[path]["index_hash"] == "":
+			statuses[path]["index_hash"] = parts[1]
+		else:
+			statuses[path]["conflict"] = true
+
+	var head_raw = await repository.shell.run("git ls-tree -r HEAD 2>/dev/null || true")
+	for line in head_raw.split("\n"):
+		if line == "":
+			continue
+		var tab = line.find("\t")
+		if tab == -1:
+			continue
+		var path = line.substr(tab + 1)
+		if not statuses.has(path):
+			continue
+		statuses[path]["exists_in_head"] = true
+		var meta = line.substr(0, tab).split(" ")
+		if meta.size() >= 3:
+			statuses[path]["head_hash"] = meta[2]
+
+	if wd_files.size() > 0:
+		var quoted = []
+		for path in wd_files:
+			quoted.append("'%s'" % path.replace("'", "'\\''"))
+		var hash_raw = await repository.shell.run("git hash-object " + " ".join(quoted) + " 2>/dev/null || true")
+		var hashes = hash_raw.split("\n")
+		if hashes.size() > 0 and hashes[-1] == "":
+			hashes.pop_back()
+		for i in range(min(wd_files.size(), hashes.size())):
+			statuses[wd_files[i]]["wd_hash"] = hashes[i]
+
+	return statuses
 		
 func update():
 	if grid and repository:
 		clear()
 		
 		# Files in the working directory.
-		var wd_files = Array((await repository.shell.run("find . -type f -not -path '*/\\.git/*'")).split("\n"))
+		var wd_files = Array((await repository.shell.run("find . -type f -not -path '*/\\.git/*' ! -name 'command*'")).split("\n"))
 		# The last entry is an empty string, remove it.
 		wd_files.pop_back()
 		wd_files = helpers.map(wd_files, self, "substr2")
@@ -73,11 +137,14 @@ func update():
 					files.push_back(f)
 				
 		files.sort_custom(Callable(self, "very_best_sort"))
-		
+
+		var file_statuses = await _collect_file_statuses(files, wd_files)
+
 		for file_path in files:
 			var item = preload("res://scenes/file_browser_item.tscn").instantiate()
 			item.label = file_path
 			item.repository = repository
+			item.file_status = file_statuses.get(file_path, {})
 			item.connect("clicked", Callable(self, "item_clicked"))
 			grid.add_child(item)
 		

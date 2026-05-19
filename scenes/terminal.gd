@@ -14,8 +14,6 @@ var git_commands_help = []
 var repository
 @onready var main = get_tree().get_root().get_node("Main")
 
-var shell = await Shell.new()
-
 var premade_commands = [
 	'git commit --allow-empty -m "empty"',
 	'echo $RANDOM | git hash-object -w --stdin',
@@ -88,13 +86,13 @@ func send_command(command):
 	editor_regex.compile("^(vim?|gedit|emacs|kate|nano|code) ")
 	command = editor_regex.sub(command, "fake-editor ")
 
-	shell.cd(repository.path)
-	var output = await shell.run(command, false)
+	repository.shell.cd(repository.path)
+	var output = await repository.shell.run(command, false)
 
 	var cmd = ShellCommand.new()
 	cmd.command = command
 	cmd.output = output
-	cmd.exit_code = shell.exit_code
+	cmd.exit_code = repository.shell.exit_code
 	command_done(cmd)
 
 func command_done(cmd):
