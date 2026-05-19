@@ -88,6 +88,8 @@ A level can consist of multiple repositories. To have more than one, you can use
 
 To open the game in the [Godot editor](https://godotengine.org), run `godot project.godot`. You can then run the game using *F5*.
 
+> **⚠️ First-run note:** The `.import/` directory is gitignored. You must open the project in the Godot editor at least once before running from the command line, so that all assets (sounds, images, etc.) are properly imported.
+
 Feel free to make improvements to the code and send pull requests! There is one exception: because merge conflicts in Godot's scene files tends to be hard to resolve, before working on an existing *\*.tscn* file, please get in touch with us.
 
 To build your own binaries, you'll need Godot's [export templates](https://docs.godotengine.org/en/stable/getting_started/workflow/export/exporting_projects.html), and `zip`, `wget`, and `7z`. Then, run `make`. On Debian/Ubuntu, the Godot binary is called `godot3`, you might need to adjust the paths in the Makefile.

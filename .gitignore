@@ -2,3 +2,12 @@
 /cache/
 /dependencies/
 /build/
+
+# Godot editor auto-generated files
+.godot/editor/
+.godot/shader_cache/
+.godot/uid_cache.bin
+
+# GSD agent artifacts
+.gsd/
+.bg-shell/
