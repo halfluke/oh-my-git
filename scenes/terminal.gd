@@ -195,10 +195,7 @@ func generate_completions(command):
 	if !(command.substr(0,4) == "git " and command.split(" ").size() <= 2) and command.split(" ").size() > 1:
 		var last_word = Array(command.split(" ")).pop_back()
 		var file_string = await repository.shell.run("find . -type f")
-		var files = file_string.split("\n")
-		files = Array(files)
-		# The last entry is an empty string, remove it.
-		files.pop_back()
+		var files = helpers.split_lines(file_string)
 		for file_path in files:
 			file_path = file_path.substr(2)
 			if file_path.substr(0,4) != ".git" and file_path.substr(0,last_word.length()) == last_word:

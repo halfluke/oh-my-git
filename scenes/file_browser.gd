@@ -96,9 +96,7 @@ func _collect_file_statuses(files: Array, wd_files: Array) -> Dictionary:
 		for path in wd_files:
 			quoted.append("'%s'" % path.replace("'", "'\\''"))
 		var hash_raw = await repository.shell.run("git hash-object " + " ".join(quoted) + " 2>/dev/null || true")
-		var hashes = hash_raw.split("\n")
-		if hashes.size() > 0 and hashes[-1] == "":
-			hashes.pop_back()
+		var hashes = helpers.split_lines(hash_raw)
 		for i in range(min(wd_files.size(), hashes.size())):
 			statuses[wd_files[i]]["wd_hash"] = hashes[i]
 
@@ -109,9 +107,7 @@ func update():
 		clear()
 		
 		# Files in the working directory.
-		var wd_files = Array((await repository.shell.run("find . -type f -not -path '*/\\.git/*' ! -name 'command*'")).split("\n"))
-		# The last entry is an empty string, remove it.
-		wd_files.pop_back()
+		var wd_files = helpers.split_lines(await repository.shell.run("find . -type f -not -path '*/\\.git/*' ! -name 'command*'"))
 		wd_files = helpers.map(wd_files, self, "substr2")
 		
 		var files = wd_files
@@ -121,13 +117,9 @@ func update():
 		
 		if repository.there_is_a_git_cache:
 			# Files in the HEAD commit.
-			head_files = Array((await repository.shell.run("git ls-tree --name-only -r HEAD 2> /dev/null || true")).split("\n"))
-			# The last entry is an empty string, remove it.
-			head_files.pop_back()
+			head_files = helpers.split_lines(await repository.shell.run("git ls-tree --name-only -r HEAD 2> /dev/null || true"))
 			# Files in the index.
-			index_files = Array((await repository.shell.run("git ls-files -s | cut -f2 | uniq")).split("\n"))
-			# The last entry is an empty string, remove it.
-			index_files.pop_back()
+			index_files = helpers.split_lines(await repository.shell.run("git ls-files -s | cut -f2 | uniq"))
 		
 			for f in head_files:
 				if not f in files:

@@ -1,95 +1,88 @@
-[gd_scene load_steps=6 format=2]
+[gd_scene load_steps=6 format=3 uid="uid://bq6t5roltbk10"]
 
-[ext_resource path="res://styles/theme.tres" type="Theme" id=1]
-[ext_resource path="res://scenes/level_select.gd" type="Script" id=2]
-[ext_resource path="res://styles/alert_button.tres" type="StyleBox" id=3]
-[ext_resource path="res://scenes/music_button.tscn" type="PackedScene" id=4]
+[ext_resource type="Theme" uid="uid://d2e7phm6ufj2i" path="res://styles/theme.tres" id="1"]
+[ext_resource type="Script" path="res://scenes/level_select.gd" id="2"]
+[ext_resource type="StyleBox" path="res://styles/alert_button.tres" id="3"]
+[ext_resource type="PackedScene" path="res://scenes/music_button.tscn" id="4"]
 
-[sub_resource type="StyleBoxFlat" id=1]
-bg_color = Color( 0.54902, 0.0392157, 0.0392157, 1 )
+[sub_resource type="StyleBoxFlat" id="1"]
+bg_color = Color(0.54902, 0.0392157, 0.0392157, 1)
 corner_radius_top_left = 4
 corner_radius_top_right = 4
 corner_radius_bottom_right = 4
 corner_radius_bottom_left = 4
 
 [node name="LevelSelect" type="Control"]
+layout_mode = 3
+anchors_preset = 15
 anchor_right = 1.0
 anchor_bottom = 1.0
-theme = ExtResource( 1 )
-script = ExtResource( 2 )
-__meta__ = {
-"_edit_use_anchors_": false
-}
+grow_horizontal = 2
+grow_vertical = 2
+theme = ExtResource("1")
+script = ExtResource("2")
 
 [node name="ScrollContainer" type="ScrollContainer" parent="."]
+layout_mode = 0
 anchor_right = 1.0
 anchor_bottom = 1.0
-__meta__ = {
-"_edit_use_anchors_": false
-}
 
 [node name="MarginContainer" type="MarginContainer" parent="ScrollContainer"]
-offset_right = 1920.0
-offset_bottom = 1080.0
+layout_mode = 2
 size_flags_horizontal = 3
 size_flags_vertical = 3
-theme_override_constants/margin_right = 600
 theme_override_constants/margin_left = 600
+theme_override_constants/margin_right = 600
 
 [node name="Levels" type="VBoxContainer" parent="ScrollContainer/MarginContainer"]
-offset_left = 600.0
-offset_right = 1320.0
-offset_bottom = 1080.0
+layout_mode = 2
 size_flags_horizontal = 3
 
 [node name="Button" type="Button" parent="."]
+layout_mode = 0
 offset_left = 61.0902
 offset_top = 59.0538
 offset_right = 126.09
 offset_bottom = 98.0538
 text = "Back"
-__meta__ = {
-"_edit_use_anchors_": false
-}
 
 [node name="Button2" type="Button" parent="."]
+layout_mode = 0
 offset_left = 138.588
 offset_top = 59.3009
 offset_right = 226.588
 offset_bottom = 98.3009
 focus_mode = 0
-focus_mode = 0
 text = "Reload"
-__meta__ = {
-"_edit_use_anchors_": false
-}
 
-[node name="Button3" parent="." instance=ExtResource( 4 )]
+[node name="Button3" parent="." instance=ExtResource("4")]
+layout_mode = 0
+offset_left = 0.0
+offset_top = 0.0
+offset_right = 146.0
+offset_bottom = 39.0
 
 [node name="HelpLabel" type="Label" parent="."]
 visible = false
+layout_mode = 0
 offset_left = 63.0
 offset_top = 159.0
 offset_right = 378.0
 offset_bottom = 220.0
 text = "Help us improving Oh My Git! by
 answering some questions:"
-__meta__ = {
-"_edit_use_anchors_": false
-}
 
 [node name="Button3" type="Button" parent="HelpLabel"]
+layout_mode = 0
 offset_left = -2.0
 offset_top = 68.0
 offset_right = 313.0
 offset_bottom = 118.0
-theme_override_styles/hover = SubResource( 1 )
-theme_override_styles/focus = ExtResource( 3 )
-theme_override_styles/normal = ExtResource( 3 )
+theme_override_styles/focus = ExtResource("3")
+theme_override_styles/hover = SubResource("1")
+theme_override_styles/normal = ExtResource("3")
 text = "To the survey /o/"
-__meta__ = {
-"_edit_use_anchors_": false
-}
+
 [connection signal="pressed" from="Button" to="." method="back"]
 [connection signal="pressed" from="Button2" to="." method="reload"]
 [connection signal="pressed" from="HelpLabel/Button3" to="." method="onSurveyPressed"]

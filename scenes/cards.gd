@@ -50,12 +50,14 @@ func draw_card(card):
 func draw(ids):
 	for card in get_tree().get_nodes_in_group("cards"):
 		card.queue_free()
-		
+	if ids.is_empty():
+		return
+	call_deferred("_finish_draw", ids)
+
+func _finish_draw(ids):
 	for id in ids:
 		draw_card(card_store[id])
-	
 	arrange_cards()
-	
 	if ids.size() > 0:
 		game.notify("These are your cards! Drag them to highlighted areas to play them!", self, "cards")
 	

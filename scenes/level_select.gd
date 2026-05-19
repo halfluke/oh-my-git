@@ -3,7 +3,7 @@ extends Control
 @onready var level_list = $ScrollContainer/MarginContainer/Levels
 
 func _ready():
-	reload()
+	await reload()
 
 func load(chapter_id, level_id):
 	game.current_chapter = chapter_id
@@ -17,6 +17,7 @@ func back():
 func reload():
 	for child in level_list.get_children():
 		child.queue_free()
+	await get_tree().process_frame
 	
 	var chapter_id = 0
 	

@@ -14,6 +14,12 @@ func map(array, object, f):
 		new_array.push_back(object.call(f, array[i]))
 	return new_array
 
+func split_lines(text: String) -> Array:
+	var lines := Array(text.split("\n", false))
+	if not lines.is_empty() and lines[-1] == "":
+		lines.pop_back()
+	return lines
+
 # Run a simple command with arguments, blocking, using OS.execute.
 func exec(command, args=[], crash_on_fail=true):
 	var debug = false

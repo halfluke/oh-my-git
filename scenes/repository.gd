@@ -91,7 +91,7 @@ func set_label(new_label):
 	if label_node:
 		if new_label == "yours":
 			new_label = ""
-			$Rows/RepoVis/SeparatorLine/DropArea.queue_free()
+			$Rows/RepoVis/SeparatorLine/DropArea.call_deferred("queue_free")
 			$Rows/RepoVis/SeparatorLine.hide()
 		else:
 			game.notify("This is the time machine of another person! To interact with it, you need special commands!", self, "remote")
@@ -146,8 +146,7 @@ func update_objects():
 func update_node_positions():
 	if there_is_a_git_cache:
 		var graph_text = await shell.run("git log --graph --oneline --all --no-abbrev")
-		var graph_lines = Array(graph_text.split("\n"))
-		graph_lines.pop_back()
+		var graph_lines = helpers.split_lines(graph_text)
 		
 		for line_count in range(graph_lines.size()):
 			var line = graph_lines[line_count]
@@ -222,9 +221,7 @@ func git(args, splitlines = false):
 	var o = await shell.run("git --no-replace-objects " + args)
 	
 	if splitlines:
-		o = o.split("\n")
-		# Remove last empty line.
-		o.remove_at(len(o)-1)
+		o = helpers.split_lines(o)
 		
 	else:
 		# Remove trailing newline.
@@ -339,8 +336,9 @@ func remove_gone_stuff():
 	# Delete objects, if they disappeared.
 	for o in objects.keys():
 		if not all.has(o):
-			objects[o].queue_free()
+			var obj = objects[o]
 			objects.erase(o)
+			obj.call_deferred("queue_free")
 
 func _on_mouse_entered():
 	mouse_inside = true
