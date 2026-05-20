@@ -165,9 +165,9 @@ func _track_cleanup(node: Node) -> void:
 func _cleanup() -> void:
 	for node in _cleanup_nodes:
 		if is_instance_valid(node):
-			node.free()
+			node.queue_free()
 	_cleanup_nodes.clear()
-	await create_timer(0.05).timeout
+	await process_frame
 
 func _test_shell() -> void:
 	print("-- shell --")

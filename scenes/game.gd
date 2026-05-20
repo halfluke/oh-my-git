@@ -95,19 +95,22 @@ func save_state():
 	savegame.close()
 	
 func load_state():
-	var savegame = FileAccess.open(_file,FileAccess.READ)
-	if not savegame:
-		save_state()
-	
-	#savegame.open(_file, File.READ)
-	
 	state = _initial_state()
+	var savegame = FileAccess.open(_file, FileAccess.READ)
+	if savegame == null:
+		save_state()
+		return
+
 	var test_json_conv = JSON.new()
-	test_json_conv.parse(savegame.get_line())
-	var new_state = test_json_conv.get_data()
-	for key in new_state:
-		state[key] = new_state[key]
+	var parse_err = test_json_conv.parse(savegame.get_line())
 	savegame.close()
+	if parse_err != OK:
+		return
+
+	var new_state = test_json_conv.get_data()
+	if new_state is Dictionary:
+		for key in new_state:
+			state[key] = new_state[key]
 	
 # filename is relative to the tmp directory!
 func create_file_in_game_env(filename, content):

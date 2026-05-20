@@ -9,6 +9,7 @@ on:
 env:
   GODOT_VERSION: 4.3
   HOME: /github/home
+  GODOT: godot
 
 jobs:
   test:
@@ -20,6 +21,7 @@ jobs:
       - name: Prepare environment
         run: |
           mkdir -p "$HOME" "$HOME/.config" "$HOME/.local/share"
+          echo "HOME=$HOME" >> "$GITHUB_ENV"
       - name: Install dependencies
         run: apt-get update && apt-get install -y git make
       - name: Run automated tests

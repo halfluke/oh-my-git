@@ -32,7 +32,15 @@ grep -q 'script_export_mode=2' export_presets.cfg
 grep -q 'GODOT ?= godot4' Makefile
 
 echo "==> Godot headless tests"
-"$GODOT" --headless --path "$ROOT" --script res://tools/run_tests.gd
+set +e
+GODOT_OUTPUT=$("$GODOT" --headless --path "$ROOT" --script res://tools/run_tests.gd 2>&1)
+GODOT_EXIT=$?
+set -e
+echo "$GODOT_OUTPUT"
+echo "$GODOT_OUTPUT" | grep -qE "=== Results: [0-9]+ passed, 0 failed ===" || {
+	echo "Godot test runner reported failures (godot exit ${GODOT_EXIT})" >&2
+	exit 1
+}
 
 if [[ "${RUN_EXPORT_TEST:-0}" == "1" ]]; then
 	echo "==> Linux export smoke test"
