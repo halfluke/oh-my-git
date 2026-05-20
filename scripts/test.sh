@@ -5,6 +5,12 @@ set -euo pipefail
 ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 cd "$ROOT"
 
+# GitHub Actions container jobs need a writable HOME for Godot user:// paths.
+if [[ ! -w "${HOME:-/}" ]]; then
+	export HOME="/tmp/godot-home"
+fi
+mkdir -p "$HOME"
+
 GODOT="${GODOT:-godot4}"
 if ! command -v "$GODOT" >/dev/null 2>&1; then
 	if command -v godot >/dev/null 2>&1; then
