@@ -24,7 +24,16 @@ func get_tmp_prefix():
 	else:
 		return OS.get_user_data_dir() + "/tmp/"
 
+func _ensure_audio_bus_layout() -> void:
+	# Editor sometimes drops [audio] from project.godot on save; ensure SFX bus exists.
+	if AudioServer.get_bus_index("SFX") >= 0:
+		return
+	var layout = load("res://default_bus_layout.tres") as AudioBusLayout
+	if layout:
+		AudioServer.set_bus_layout(layout)
+
 func _ready():
+	_ensure_audio_bus_layout()
 	mutex = Mutex.new()
 	load_state()
 	

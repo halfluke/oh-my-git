@@ -60,8 +60,8 @@ func _git_available() -> bool:
 func _test_build_config() -> void:
 	print("-- build config --")
 	var workflow: String = _helpers().read_file("res://.github/workflows/build.yml")
-	_assert(workflow.find("GODOT_VERSION: 4.3") != -1, "build.yml should target Godot 4.3")
-	_assert(workflow.find("barichello/godot-ci:4.3") != -1, "build.yml should use godot-ci 4.3 image")
+	_assert(workflow.find("GODOT_VERSION: 4.6.2") != -1, "build.yml should target Godot 4.6.2")
+	_assert(workflow.find("barichello/godot-ci:4.6.2") != -1, "build.yml should use godot-ci 4.6.2 image")
 
 	var presets: String = _helpers().read_file("res://export_presets.cfg")
 	for needle in [
@@ -81,7 +81,7 @@ func _test_project_and_scenes() -> void:
 	print("-- project and scenes --")
 	var features: PackedStringArray = ProjectSettings.get_setting("application/config/features")
 	_assert(features is PackedStringArray, "project features should be PackedStringArray")
-	_assert("4.3" in features, "project should declare Godot 4.3 feature")
+	_assert("4.6" in features, "project should declare Godot 4.6 feature")
 
 	for path in SCENE_PATHS:
 		var packed: PackedScene = load(path)

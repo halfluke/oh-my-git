@@ -24,8 +24,8 @@ fi
 echo "Using Godot: $($GODOT --version 2>&1 | head -1)"
 
 echo "==> Static config checks"
-grep -q 'GODOT_VERSION: 4.3' .github/workflows/build.yml
-grep -q 'barichello/godot-ci:4.3' .github/workflows/build.yml
+grep -q 'GODOT_VERSION: 4.6.2' .github/workflows/build.yml
+grep -q 'barichello/godot-ci:4.6.2' .github/workflows/build.yml
 grep -q 'platform="Linux"' export_presets.cfg
 grep -q 'name="Mac OS"' export_presets.cfg
 grep -q 'script_export_mode=2' export_presets.cfg

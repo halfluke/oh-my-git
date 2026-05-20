@@ -14,7 +14,7 @@ config/name="Oh My Git!"
 run/main_scene="res://scenes/title.tscn"
 config/use_custom_user_dir=true
 config/custom_user_dir_name="Oh My Git"
-config/features=PackedStringArray("4.3")
+config/features=PackedStringArray("4.6")
 boot_splash/bg_color=Color(0, 0, 0, 1)
 
 [audio]

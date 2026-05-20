@@ -7,7 +7,7 @@ on:
   pull_request:
 
 env:
-  GODOT_VERSION: 4.3
+  GODOT_VERSION: 4.6.2
   HOME: /github/home
   GODOT: godot
 
@@ -15,14 +15,16 @@ jobs:
   test:
     runs-on: ubuntu-24.04
     container:
-      image: barichello/godot-ci:4.3
+      image: barichello/godot-ci:4.6.2
     steps:
       - uses: actions/checkout@v4
       - name: Prepare environment
         run: |
-          mkdir -p "$HOME" "$HOME/.config" "$HOME/.local/share"
+          mkdir -p "$HOME" "$HOME/.config" "$HOME/.local/share/godot/export_templates"
+          cp -a "/root/.local/share/godot/export_templates/${GODOT_VERSION}.stable" \
+            "$HOME/.local/share/godot/export_templates/${GODOT_VERSION}.stable"
           echo "HOME=$HOME" >> "$GITHUB_ENV"
       - name: Install dependencies
-        run: apt-get update && apt-get install -y git make
+        run: apt-get update && apt-get install -y git make libfontconfig1
       - name: Run automated tests
         run: bash scripts/test.sh

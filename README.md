@@ -16,7 +16,7 @@ If you have ideas for new features, we'd be excited to hear them! Also in that c
 
 Wanna build your own level? Great! Here's how to do it:
 
-1. Download [Godot **4.3**](https://godotengine.org/download/archive/4.3-stable/) (or a compatible 4.x release).
+1. Download [Godot **4.6**](https://godotengine.org/download/archive/4.6-stable/) (or a compatible 4.x release).
 1. Clone this repository.
 1. Run the game – the easiest way to do so is to run `godot4 scenes/main.tscn` from the project directory (or `godot` if that is your Godot 4 binary name).
 1. Get a bit familiar with the levels which are currently there.
@@ -81,7 +81,7 @@ To open the game in the [Godot editor](https://godotengine.org), run `godot4 pro
 
 Feel free to make improvements to the code and send pull requests! There is one exception: because merge conflicts in Godot's scene files tends to be hard to resolve, before working on an existing *\*.tscn* file, please get in touch with us.
 
-To build your own binaries, install Godot 4's [export templates](https://docs.godotengine.org/en/stable/getting_started/workflow/export/exporting_projects.html) for your Godot version (e.g. `4.3.stable`), plus `zip`, `wget`, and `7z`. Then run `make`. The Makefile uses `godot4` by default; override with `make GODOT=/path/to/godot` if needed.
+To build your own binaries, install Godot 4's [export templates](https://docs.godotengine.org/en/stable/getting_started/workflow/export/exporting_projects.html) for your Godot version (e.g. `4.6.stable`), plus `zip`, `wget`, and `7z`. Then run `make`. The Makefile uses `godot4` by default; override with `make GODOT=/path/to/godot` if needed.
 
 ## Code of Conduct
 
