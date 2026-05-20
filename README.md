@@ -2,40 +2,53 @@
 
 **Oh My Git!** is an open-source game about learning Git!
 
-## Play the game!
+> **Unofficial fork.** This repository is a community-maintained fork of [Oh My Git!](https://github.com/git-learning-game/oh-my-git) by [blinry](https://github.com/blinry) and [bleeptrack](https://github.com/bleeptrack). Upstream home: [git-learning-game/oh-my-git](https://github.com/git-learning-game/oh-my-git).
+>
+> You are on the **`main`** branch (Godot **3.x**). The **`godot4`** branch is the Godot **4.6** port with the same **Beyond Git** content. Questions or feedback about this fork: comment on [upstream issue #237](https://github.com/git-learning-game/oh-my-git/issues/237).
 
-This fork has no binaries, if you want to enjoy the changes install Godot 3, clone locally and execute godot3 project.godot from your repo path
+### Branches
 
-In the **Play** level list, the extra **Beyond Git** reading sections (GitHub, GitLab, Gitea, Bitbucket + Jira, Azure DevOps) appear grouped at the bottom after the main Git tutorial chapters:
+| Branch | Engine | Notes |
+|--------|--------|--------|
+| **`main`** | Godot 3.x | This branch; play from source below or use [official itch.io builds](https://blinry.itch.io/oh-my-git). |
+| **`godot4`** | Godot 4.6 | Port + Beyond Git; see [`godot4` README](https://github.com/halfluke/oh-my-git/blob/godot4/README.md). |
+
+## Play the game
+
+This fork does **not** ship release binaries for the **Beyond Git** additions.
+
+- **Official Godot 3 builds:** [itch.io](https://blinry.itch.io/oh-my-git) (upstream; does not include this fork's extra levels unless you run from source here).
+- **This branch from source:**
+  1. Install [Godot 3.x](https://godotengine.org/download/3.x).
+  2. Clone this repo on **`main`**: `git clone -b main https://github.com/halfluke/oh-my-git.git` (or `git checkout main`).
+  3. Open **`project.godot`** in the editor and press **F5**, or run `godot3 project.godot` from the repo root (on Debian/Ubuntu the binary is often `godot3`; some systems use `godot`).
+
+## Beyond Git
+
+In the **Play** level list, extra **Beyond Git** reading sections (GitHub, GitLab, Gitea, Bitbucket + Jira, Azure DevOps, and related platform theory) appear grouped at the bottom after the main Git tutorial chapters:
 
 ![Level select: Beyond Git sections in the menu](images/readme-beyond-git-level-menu.png)
 
-## ℹ️ A note on the maintenance status
+## About upstream maintenance
 
-bleeptrack and blinry developed Oh My Git! in 2020/2021, with six months of funding from the Prototype Fund.
-Currently, the project is in low-maintenance mode, and we don't have a lot of time to dedicate to it.
+The original [Oh My Git!](https://github.com/git-learning-game/oh-my-git) is in **low-maintenance** mode; large upstream pull requests may take a long time. This fork is maintained independently for **Beyond Git** and the **`godot4`** port—use [issue #237](https://github.com/git-learning-game/oh-my-git/issues/237) for feedback on this fork.
 
-While we can review and merge simple fixes, **please have patience with us and understand it might take a long time,**
-especially with larger changes.
+## Report bugs
 
-If you'd like to work on a big change, we suggest you get in touch with us before you start working on it,
-to discuss how to approach that best. Thanks for your interest to contribute!
-
-## Report bugs!
-
-If something doesn't work or looks broken, please let us know! You can describe the issue you're having [in our issue tracker](https://github.com/git-learning-game/oh-my-git/issues).
+- **This fork (Beyond Git, Godot 3 branch):** comment on [upstream issue #237](https://github.com/git-learning-game/oh-my-git/issues/237).
+- **Original Oh My Git! game:** use the [upstream issue tracker](https://github.com/git-learning-game/oh-my-git/issues).
 
 ## Build your own level!
 
 Wanna build your own level? Great! Here's how to do it:
 
-1. Download the latest version of the [Godot **3** game engine](https://godotengine.org/download/3.x). Godot 4 is not supported yet.
-1. Clone this repository.
-1. Run the game – the easiest way to do so is to run `godot scenes/main.tscn` from the project directory.
-1. Get a bit familiar with the levels which are currently there.
-1. Take a look into the `levels` directory. It's split into chapters, and each level is a file.
-1. Make a copy of an existing level or start writing your own. See the documentation of the format below.
-1. Write and test your level. If you're happy with it, feel free to send it to us in a pull request! <3
+1. Download the latest [Godot **3.x**](https://godotengine.org/download/3.x) editor (this branch; Godot 4 is on the **`godot4`** branch).
+2. Clone this repository and stay on **`main`**.
+3. Run the game—the easiest way is `godot3 scenes/main.tscn` from the project directory (or `godot` where that is your Godot 3 binary).
+4. Get a bit familiar with the levels which are currently there.
+5. Take a look into the `levels` directory. It's split into chapters, and each level is a file.
+6. Make a copy of an existing level or start writing your own. See the documentation of the format below.
+7. Write and test your level. For this fork, discuss in [#237](https://github.com/git-learning-game/oh-my-git/issues/237); upstream may accept PRs for the original game separately.
 
 ### Level format
 
@@ -86,13 +99,13 @@ A level can consist of multiple repositories. To have more than one, you can use
 
 ## Contribute code!
 
-To open the game in the [Godot editor](https://godotengine.org), run `godot project.godot`. You can then run the game using *F5*.
+To open the game in the [Godot editor](https://godotengine.org), run `godot3 project.godot`. You can then run the game using *F5*.
 
-> **⚠️ First-run note:** The `.import/` directory is gitignored. You must open the project in the Godot editor at least once before running from the command line, so that all assets (sounds, images, etc.) are properly imported.
+> **First-run note:** The `.import/` directory is gitignored. Open the project in the Godot 3 editor at least once before running from the command line, so assets (sounds, images, etc.) are imported correctly.
 
-Feel free to make improvements to the code and send pull requests! There is one exception: because merge conflicts in Godot's scene files tends to be hard to resolve, before working on an existing *\*.tscn* file, please get in touch with us.
+Maintenance of Beyond Git on **`main`** and the Godot 4 port on **`godot4`** happens in this fork; coordinate in [#237](https://github.com/git-learning-game/oh-my-git/issues/237) before large `*.tscn` edits.
 
-To build your own binaries, you'll need Godot's [export templates](https://docs.godotengine.org/en/stable/getting_started/workflow/export/exporting_projects.html), and `zip`, `wget`, and `7z`. Then, run `make`. On Debian/Ubuntu, the Godot binary is called `godot3`, you might need to adjust the paths in the Makefile.
+To build your own binaries, install Godot 3 [export templates](https://docs.godotengine.org/en/stable/getting_started/workflow/export/exporting_projects.html), plus `zip`, `wget`, and `7z`, then run `make`. On Debian/Ubuntu the Godot binary is often `godot3`—adjust paths in the Makefile if needed.
 
 ## Code of Conduct
 
@@ -100,7 +113,7 @@ We have a [Code of Conduct](CODE_OF_CONDUCT.md) in place that applies to all pro
 
 ## Funding
 
-We received funding for six months in 2020/2021 from the [Prototype Fund](https://www.prototypefund.de). Thanks!
+The original game received funding for six months in 2020/2021 from the [Prototype Fund](https://www.prototypefund.de). Thanks!
 
 <a href="https://www.bmbf.de/en/"><img src="https://www.dipf.de/en/images/BMBF_4C_M_e.jpg/@@download/image/BMBF_4C_M_e.jpg" alt="Logo of the German Ministry for Education and Research" height="100px"></a>&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <a href="https://prototypefund.de/en/"><img src="https://raw.githubusercontent.com/prototypefund/ptf-ci/main/logos/PrototypeFund-Icon.svg" alt="Logo of the Prototype Fund" height="100px"></a>&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <a href="https://okfn.de/en/"><img src="https://upload.wikimedia.org/wikipedia/commons/4/4d/Open_Knowledge_Foundation_Deutschland_Logo.svg" alt="Logo of the Open Knowledge Foundation Germany" height="100px"></a>
 
