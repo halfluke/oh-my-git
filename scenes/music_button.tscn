@@ -1,6 +1,6 @@
-[gd_scene load_steps=2 format=2]
+[gd_scene load_steps=2 format=3]
 
-[ext_resource path="res://scenes/music_button.gd" type="Script" id=1]
+[ext_resource type="Script" path="res://scenes/music_button.gd" id="1"]
 
 [node name="Button3" type="Button"]
 offset_left = 241.005
@@ -10,8 +10,9 @@ offset_bottom = 97.856
 focus_mode = 0
 focus_mode = 0
 text = "Toggle music"
-script = ExtResource( 1 )
+script = ExtResource("1")
 __meta__ = {
 "_edit_use_anchors_": false
 }
+
 [connection signal="pressed" from="." to="." method="toggle_music"]

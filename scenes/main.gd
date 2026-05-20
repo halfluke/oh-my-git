@@ -58,7 +58,7 @@ func load_level(level_id):
 	game.current_level = level_id
 	game.used_cards = false
 	
-	AudioServer.set_bus_mute(AudioServer.get_bus_index("SFX"), true)
+	_set_sfx_muted(true)
 	
 	await levels.chapters[game.current_chapter].levels[game.current_level].construct()
 
@@ -110,7 +110,7 @@ func load_level(level_id):
 	t.start()
 	await t.timeout
 	t.queue_free()
-	AudioServer.set_bus_mute(AudioServer.get_bus_index("SFX"), false)
+	_set_sfx_muted(false)
 	
 #	chapter_select.select(game.current_chapter)
 #	level_select.select(game.current_level)
@@ -229,3 +229,11 @@ func new_tip():
 
 func back():
 	get_tree().change_scene_to_file("res://scenes/level_select.tscn")
+
+func _sfx_bus_index() -> int:
+	return AudioServer.get_bus_index("SFX")
+
+func _set_sfx_muted(muted: bool) -> void:
+	var idx = _sfx_bus_index()
+	if idx >= 0:
+		AudioServer.set_bus_mute(idx, muted)

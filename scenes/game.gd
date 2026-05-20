@@ -30,8 +30,8 @@ func _ready():
 	
 	if OS.has_feature("standalone"):
 		get_tree().set_auto_accept_quit(false)
-	else:
-		game.toggle_music()
+	elif OS.has_feature("editor"):
+		toggle_music()
 	
 	if OS.get_name() == "Windows":
 		start_remote_shell()
@@ -137,7 +137,9 @@ func open_survey():
 	OS.shell_open("https://docs.google.com/forms/d/e/1FAIpQLSehHVcYfELT59h6plcn2ilbuqBcmDX3TH0qzB4jCgFIFOy_qg/viewform")
 	
 func toggle_music():
-	var music = game.find_child("Music")
+	var music = find_child("Music")
+	if music == null:
+		return
 	if music.volume_db > -20:
 		music.volume_db -= 100
 	else:
