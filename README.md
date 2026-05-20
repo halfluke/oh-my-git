@@ -2,27 +2,60 @@
 
 **Oh My Git!** is an open-source game about learning Git!
 
-## Play the game!
+> **Unofficial fork.** This repository is a community-maintained fork of [Oh My Git!](https://github.com/git-learning-game/oh-my-git) by [blinry](https://github.com/blinry) and [bleeptrack](https://github.com/bleeptrack). Upstream home: [git-learning-game/oh-my-git](https://github.com/git-learning-game/oh-my-git).
+>
+> You are on the **`godot4`** branch (Godot **4.6**). The **`main`** branch is the same game and **Beyond Git** content on **Godot 3**. Questions or feedback about this fork: comment on [issue #237](https://github.com/git-learning-game/oh-my-git/issues/237).
 
-You can download binaries for Linux, macOS, and Windows [from itch.io](https://blinry.itch.io/oh-my-git)!
+### Branches
 
-## Report bugs!
+| Branch | Engine | Notes |
+|--------|--------|--------|
+| **`main`** | Godot 3.x | Original-style layout; play from source or [official itch.io builds](https://blinry.itch.io/oh-my-git) (Godot 3 only). |
+| **`godot4`** | Godot 4.6 | Port of the game + Beyond Git; maintained here. |
 
-If something doesn't work or looks broken, please let us know! You can describe the issue you're having [in our issue tracker](https://github.com/git-learning-game/oh-my-git/issues).
+## Play the game
 
-If you have ideas for new features, we'd be excited to hear them! Also in that case, we invite you to [open an issue](https://github.com/git-learning-game/oh-my-git/issues)!
+This fork does **not** ship release binaries. Official downloads on [itch.io](https://blinry.itch.io/oh-my-git) are **Godot 3** builds from upstream—they will not run this branch.
+
+To play the Godot 4 version:
+
+1. Install [Godot 4.6](https://godotengine.org/download/archive/4.6-stable/) (or a compatible 4.6.x editor).
+2. Clone this repo and check out the **`godot4`** branch: `git clone -b godot4 https://github.com/halfluke/oh-my-git.git` (or switch an existing clone with `git checkout godot4`).
+3. Open **`project.godot`** in the editor and press **F5**, or from the repo root run `godot4 scenes/main.tscn` (use `godot` if that is your Godot 4 binary name).
+
+To build your own export, install Godot 4 [export templates](https://docs.godotengine.org/en/stable/getting_started/workflow/export/exporting_projects.html) for your editor version (e.g. `4.6.stable`), plus `zip`, `wget`, and `7z`, then run `make` (override with `make GODOT=/path/to/godot` if needed).
+
+## Beyond Git
+
+In the **Play** level list, extra **Beyond Git** reading sections (GitHub, GitLab, Gitea, Bitbucket + Jira, Azure DevOps, and related platform theory) appear grouped at the bottom after the main Git tutorial chapters:
+
+![Level select: Beyond Git sections in the menu](images/readme-beyond-git-level-menu.png)
+
+## What's extra in this fork
+
+- **Godot 4.6.2** port on the `godot4` branch
+- **Beyond Git** platform and theory chapters (same content themes as on `main`)
+- **Freeroam** navigation with previous/next between levels
+- **Reset progress** from the level menu
+
+## Report bugs
+
+- **This fork (Godot 4, Beyond Git, packaging):** add a comment on [upstream issue #237](https://github.com/git-learning-game/oh-my-git/issues/237).
+- **Original Oh My Git! game:** use the [upstream issue tracker](https://github.com/git-learning-game/oh-my-git/issues).
+
+Ideas for new features are welcome in the same places.
 
 ## Build your own level!
 
 Wanna build your own level? Great! Here's how to do it:
 
-1. Download [Godot **4.6**](https://godotengine.org/download/archive/4.6-stable/) (or a compatible 4.x release).
-1. Clone this repository.
-1. Run the game – the easiest way to do so is to run `godot4 scenes/main.tscn` from the project directory (or `godot` if that is your Godot 4 binary name).
-1. Get a bit familiar with the levels which are currently there.
-1. Take a look into the `levels` directory. It's split into chapters, and each level is a file.
-1. Make a copy of an existing level or start writing your own. See the documention of the format below.
-1. Write and test your level. If you're happy with it, feel free to send it to us in a pull request! <3
+1. Download [Godot **4.6**](https://godotengine.org/download/archive/4.6-stable/) (or a compatible 4.6.x release).
+2. Clone this repository and check out the **`godot4`** branch.
+3. Run the game—the easiest way is `godot4 scenes/main.tscn` from the project directory (or `godot` if that is your Godot 4 binary name).
+4. Get a bit familiar with the levels which are currently there.
+5. Take a look into the `levels` directory. It's split into chapters, and each level is a file.
+6. Make a copy of an existing level or start writing your own. See the documentation of the format below.
+7. Write and test your level. If you're happy with it, open a pull request on this fork—or, for changes that belong in the original game, consider upstream after discussing in [#237](https://github.com/git-learning-game/oh-my-git/issues/237).
 
 ### Level format
 
@@ -79,9 +112,17 @@ At this stage, we're still exploring ourselves which kind of levels would be fun
 
 To open the game in the [Godot editor](https://godotengine.org), run `godot4 project.godot`. You can then run the game using *F5*.
 
-Feel free to make improvements to the code and send pull requests! There is one exception: because merge conflicts in Godot's scene files tends to be hard to resolve, before working on an existing *\*.tscn* file, please get in touch with us.
+> **First-run note:** The `.import/` directory is gitignored. Open the project in the Godot 4 editor at least once before running from the command line, so assets (sounds, images, etc.) are imported correctly.
 
-To build your own binaries, install Godot 4's [export templates](https://docs.godotengine.org/en/stable/getting_started/workflow/export/exporting_projects.html) for your Godot version (e.g. `4.6.stable`), plus `zip`, `wget`, and `7z`. Then run `make`. The Makefile uses `godot4` by default; override with `make GODOT=/path/to/godot` if needed.
+Upstream may still accept some pull requests, but day-to-day maintenance of the Godot 4 port happens on the **`godot4`** branch in this fork. Before large changes, say hello in [#237](https://github.com/git-learning-game/oh-my-git/issues/237).
+
+Because merge conflicts in Godot scene files are painful, before editing an existing `*.tscn` file, please coordinate in [#237](https://github.com/git-learning-game/oh-my-git/issues/237).
+
+To build binaries locally, see **Play the game** (export templates + `make`).
+
+### Tests
+
+Run `make test` with Godot 4.6 available on your PATH, or use the Docker-based test path documented in the Makefile if you prefer an isolated environment.
 
 ## Code of Conduct
 
