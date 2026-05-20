@@ -15,14 +15,31 @@ mode = platform_theory
 
 [center][color=#00aa90]organization / team permissions[/color]  inherit like folders[/center]
 
+[code]
+   git remote add upstream https://gitea.example/upstream/repo
+   git fetch upstream && git rebase upstream/main
+[/code]
+
 [description]
 
-[b]Forks[/b] duplicate refs and objects into another owner space so push access does not imply trust on the original repo. Gitea’s UI creates the fork and suggests remotes; Git operations match other forges.
+Gitea [b]forks[/b] duplicate a repository into another user or organization namespace so contributors can [code]git push[/code] without write access on the canonical project—directly extending Oh My Git fork lessons where you add [code]upstream[/code], sync, and open a pull request instead of pushing to someone else’s [code]main[/code].
 
-[b]Pull from upstream:[/b] merge or rebase upstream default into your fork’s default locally, or use the web “Sync” where available—conflicts resolve with normal Git tools.
+[b]Creating and syncing forks:[/b] use the web Fork button; Gitea wires source/target remotes in docs and UI clone snippets. Clone your fork as [code]origin[/code], add upstream, fetch, merge or rebase upstream default into your topic branch before PR to reduce conflicts. Some instances offer one-click “Sync fork” when fast-forwardable.
 
-[b]Mirrors as collaboration aid:[/b] read-only mirrors of upstream can live beside active development repos; ensure issue trackers do not diverge confusingly between mirror and canonical.
+[b]Pull requests upstream:[/b] target the canonical default branch; maintainers review diff, comments, and optional status checks from external CI via webhooks. Merge strategies (merge, squash, rebase) depend on repository settings—pick team defaults consciously for history shape.
 
-[b]Organizations:[/b] group repos and delegate admin; watch default visibility (public vs private) when repos move between orgs.
+[b]Mirrors alongside forks:[/b] scheduled pull or push mirrors keep read-only copies of GitHub/GitLab sources fresh inside Gitea for air-gapped readers or backup—distinct from active forks where you commit. Label mirrors clearly so issues are not filed against stale copies.
+
+[b]Organization permissions:[/b] repos belong to users or orgs; teams grant read/write/admin. Inherited org access simplifies admin but can over-share—audit when moving repos between owners. Default visibility (public vs private) matters on multi-tenant instances.
+
+[b]Namespace collisions:[/b] fork names include owner prefix in URLs; rename upstream repo and update remotes on all active forks. Deleted upstream leaves orphan forks—communicate archival policy.
+
+[b]Trust boundaries:[/b] fork PRs may trigger Actions or webhooks—cap secrets on fork workflows like any external contribution. Signed commits ([code]git commit -S[/code]) optional but help maintainers verify identity on lightweight hosts without enterprise SSO.
+
+[b]Upstream maintainer pushes:[/b] when maintainers commit directly to contributor fork branches to fix merge conflicts, coordinate in PR comments so authors know history changed—same etiquette as rewriting someone else’s branch during rebase rescue in Oh My Git.
+
+[b]Multiple remotes locally:[/b] advanced contributors may track [code]upstream[/code], [code]origin[/code], and teammate forks; document which remote names your project standardizes in CONTRIBUTING to reduce “pushed to wrong remote” support tickets.
+
+[b]When things go wrong:[/b] PR shows “cannot merge” with endless conflicts means fork default diverged from upstream—rebase locally, push, refresh. Mirror jobs failing with auth errors usually mean expired deploy key or token—rotate credentials silently break nightly sync until someone reads logs. Contributors push to upstream URL by habit—permission denied is correct; retarget to fork remote.
 
 [b]Takeaway:[/b] lightweight forges still need heavyweight habits: signed commits, small PRs, and explicit ownership of who may merge to production branches.

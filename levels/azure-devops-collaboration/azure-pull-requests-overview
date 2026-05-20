@@ -3,25 +3,43 @@ mode = platform_theory
 
 [diagram]
 
+[center][color=#0078d4]── Azure Repos review gate ──[/color][/center]
+
 [code]
-   feature branch (Azure Repos)
-              │
-              ▼
-   CREATE PR ──► reviewers · policies · builds
-              │
-              │  optional: link work items (traceability)
-              ▼
-   complete PR ──► merge types allowed by policy
+  topic branch                    main (protected)
+  ●───●───●───●                        ●───●───●
+          \                           /
+           \   PULL REQUEST (Azure)   /
+            \←──────────────────────/
+             \  diff · threads · CI  /
+              \   linked work items  /
+               \__________________/
 [/code]
 
 [center][color=#0078d4]required reviewers · optional path filters[/color][/center]
 
+[code]
+   states:  active → vote satisfied → completed (merge)
+            ↑              ↑
+       auto-updated     policy + build validation
+[/code]
+
 [description]
 
-[b]Pull requests[/b] in Azure Repos behave like other forges: diff, threads, iteration on pushes, and merge when policies pass. [b]Branch policies[/b] can require reviewers, successful builds, linked work items, and comment resolution—stack policies carefully so contributors understand the minimum bar.
+An Azure Repos [b]pull request[/b] is the host-level object where a source branch meets a target branch with a diff, threaded discussion, reviewer votes, and optional links to Azure Boards work items. As in Oh My Git’s merge lessons, nothing about review lives inside the commit graph until someone completes the PR—but unlike a bare [code]git merge[/code] on your laptop, the server records votes, policies, and iteration history in Azure DevOps.
 
-[b]Work item links:[/b] associating a PR with Boards items helps release notes and audits; requiring links can slow tiny fixes—teams sometimes exempt hotfix branches.
+[b]Creating and iterating:[/b] push your feature branch, open a PR in the web UI or REST API, set reviewers, and keep pushing; each new tip refreshes the diff. Title and description support markdown; mention work items with [code]#12345[/code] syntax or the “Link work items” panel so builds and releases stay traceable.
 
-[b]Iteration fields:[/b] Azure DevOps tracks iteration paths separately from Git branches—keep naming aligned to reduce confusion in sprint reviews.
+[b]Reviewer mechanics:[/b] required reviewers must vote “Approve” (or satisfy optional counts) before merge when branch policies demand it. Optional reviewers can be added per path with code-owner-style files in some setups. “Wait for author” and comment threads mirror the social layer you practice when resolving merge conflicts locally—except here the thread blocks the merge button.
 
-[b]Takeaway:[/b] PRs are the negotiation layer; policies encode what “done” means before Git moves the protected ref.
+[b]Branch policies on the PR:[/b] policies can require minimum reviewers, no direct pushes to [code]main[/code], successful build validation from a named YAML pipeline, comment resolution, and linked work items. Multiple policies stack; contributors see a consolidated “status” line before Complete. Bypass permissions exist for break-glass roles—audit them, do not normalize them.
+
+[b]Merge types Git still understands:[/b] Azure Repos offers basic merge (merge commit), squash merge, and rebase with fast-forward. Pick the default your team wants for archaeology: squash keeps [code]main[/code] linear-looking; basic merge preserves branch topology like a classroom merge node with two parents.
+
+[b]Work item linkage:[/b] associating PRs with Boards items feeds release notes, burndown, and compliance queries. Requiring links helps auditors; it slows one-line hotfixes unless you exempt emergency branches. Use consistent titles ([code]fix(login): PROJ-456[/code]) so humans and WIQL queries agree.
+
+[b]Iteration vs Git branch:[/b] Azure Boards “iteration path” (sprint) is independent of Git branch names—misaligned naming confuses sprint reviews. Align convention: [code]feature/PROJ-123-short-desc[/code] on both sides where possible.
+
+[b]When things go wrong:[/b] a PR stuck on “build validation failed” often means the policy points at a pipeline that did not run on this branch, not that your code failed tests. Another classic: reviewers approved but “Must link work items” still blocks—create or link the Boards item, refresh the PR. Force-push after approval can reset required checks depending on policy settings.
+
+[b]Takeaway:[/b] treat the Azure PR as the contract between author and maintainers—intent, votes, and machine proofs—while Git remains the ledger once you click Complete.

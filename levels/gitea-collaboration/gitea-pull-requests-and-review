@@ -16,12 +16,30 @@ mode = platform_theory
 
 [center][color=#00aa90]CODEOWNERS-style paths[/color]  (where enabled)  ·  [color=#00aa90]draft PR[/color][/center]
 
+[code]
+   protected main:  no direct push · PR required · no force
+[/code]
+
 [description]
 
-[b]Pull requests[/b] on Gitea mirror the familiar forge pattern: diff against base, threaded discussion, assignees, labels, and merge when checks pass. [b]Protected branches[/b] can require pull requests, disallow force-push, and require status checks—configuration depth varies by version, so read your release notes.
+A Gitea [b]pull request[/b] ties a source branch to a base ref with diff, conversation, labels, assignees, and merge controls—same social gate Oh My Git emphasizes before integrating work onto shared [code]main[/code], stored in Gitea’s database until merge creates new Git objects on the server.
 
-[b]Reviews:[/b] comment on lines or whole files; approve or request changes depending on UI support in your version. Smaller PRs still beat giant blobs for latency and reviewer fatigue.
+[b]Opening PRs:[/b] push topic branch, open PR in UI or API, set reviewers and milestone. Additional pushes update the diff head automatically. Draft/WIP PRs (where supported) signal incomplete work while CI via Actions or webhooks still runs—avoid premature review noise.
 
-[b]Draft / WIP:[/b] mark incomplete work so CI can run without implying merge readiness—naming conventions ([code]WIP:[/code] prefix) still appear in older instances.
+[b]Review workflow:[/b] line and file comments, approve or request changes depending on version. Smaller PRs beat giant blobs for latency on modest hardware hosting the forge. Resolve conversations when addressed; maintainers may require all threads resolved before merge if branch protection says so.
+
+[b]Protected branches:[/b] repository settings can require pull requests, block force-push and deletion commits on [code]main[/code], demand status checks from external CI, and count approvals. Depth varies by Gitea/Forgejo release—read release notes before assuming GitHub parity. Path-based reviewers approximate CODEOWNERS when enabled.
+
+[b]Merge options:[/b] merge commit adds a merge node; squash collapses PR into one commit; rebase replays commits onto base tip (new SHAs). Align defaults with how you teach history in your team—linear squash logs vs preserved branch topology for bisect.
+
+[b]Status checks without native Actions:[/b] many small installs use webhooks to Jenkins or Woodpecker CI; posted commit statuses gate merge like larger platforms. Name contexts consistently so one pipeline does not overwrite another.
+
+[b]Labels and milestones:[/b] lightweight planning attaches to PRs for release trains—export release notes from merged PR titles when tags ship.
+
+[b]Auto-merge and admin habits:[/b] some versions expose auto-merge when checks pass—ensure required checks truly match your release bar, not just lint. Admins bypassing protection for convenience reintroduces direct-push risks you configured protections to prevent.
+
+[b]Conflict resolution UI:[/b] web conflict editor helps trivial merges; complex conflicts still need local [code]git merge[/code] or [code]git rebase[/code] skills from Oh My Git—train contributors to pull target branch locally when UI warns about binary or structural conflicts.
+
+[b]When things go wrong:[/b] merge button disabled despite approvals often means required status check never arrived—verify webhook delivery logs. Older instances lacking draft PRs leave WIP work reviewed too early—use [code]WIP:[/code] title prefix by convention. Protected branch bypass for admins can surprise teams—restrict admin merge habits to emergencies.
 
 [b]Takeaway:[/b] collaboration on Gitea is intentionally simpler than mega-suite products—use webhooks and external tools when you outgrow built-in policy.

@@ -21,14 +21,31 @@ mode = platform_theory
 
 [center][color=#00aa90]mirrors[/color]  ·  pull or push on cron  ·  keep forks warm[/center]
 
+[code]
+   on: [ push, pull_request ]
+   runs-on: ubuntu-latest   # needs matching runner
+[/code]
+
 [description]
 
-When Actions-style workflows are enabled, pipelines are YAML-driven similar in spirit to other platforms: jobs, steps, caches, and secrets scoped to the repo. [b]Runners[/b] must exist with matching labels; self-hosted runners are common on small installs to avoid trusting shared compute.
+When Gitea [b]Actions[/b] (or Forgejo equivalent) is enabled, workflows live as YAML in [code].gitea/workflows/[/code] or [code].github/workflows/[/code] depending on configuration—triggered by push, pull request, schedule, or manual dispatch. Jobs declare [code]runs-on[/code] labels that must match registered runners; self-hosted runners on modest hardware are common to keep compute inside your trust boundary.
 
-[b]Mirrors vs Actions:[/b] mirroring solves “keep another copy of Git history fresh”; Actions solves “run commands when events happen.” You might combine both: mirror for HA, Actions for tests on the primary.
+[b]Runners and labels:[/b] register runners at instance, org, or repo scope; label mismatches leave jobs queued forever. Fork PRs should use restricted runner pools without secrets—same untrusted-code caution as Oh My Git fork flows executed on shared CI.
 
-[b]Webhooks:[/b] POST JSON payloads to your services on repository events—signature verification should be mandatory to prevent spoofed deliveries. Rate-limit outbound calls on tiny hardware.
+[b]Mirrors vs Actions:[/b] mirroring keeps Git history synchronized on a schedule; Actions runs commands on events. Combine intentionally: mirror upstream for read-only HA while Actions tests your canonical repo on each push. Do not assume mirror freshness substitutes for CI on the repo developers actually merge into.
 
-[b]Matrix builds:[/b] where supported, fan out across OS or Go versions like larger CI systems; watch total wall time on constrained runners.
+[b]Caches and artifacts:[/b] speed builds with dependency caches; pass binaries between jobs via artifacts. On resource-constrained hosts, cap retention and concurrent jobs so human [code]git push[/code] stays responsive—queue storms during monorepo matrix builds are a top complaint on small installs.
+
+[b]Composite with webhooks:[/b] even without Actions, webhooks POST JSON on repository events to external CI (Woodpecker, Drone, Jenkins). Signature verification mandatory; handlers idempotent for retries.
+
+[b]Workflow portability:[/b] GitHub Actions syntax often ports with edits—verify [code]actions/checkout[/code] equivalents, secret injection, and path filters. Pin action versions to commits or tags you trust; marketplace actions may not exist on air-gapped instances.
+
+[b]Matrix builds:[/b] fan out across OS or language versions where supported—watch total wall time and disk on Raspberry Pi-class runners hosting hobby forges.
+
+[b]Scheduled workflows:[/b] cron-triggered Actions mirror upstream mirrors on a schedule—use distinct workflows for “test on push” versus “sync mirror nightly” so failures route to different on-call paths. Overlapping schedules can starve runners during business hours if cron peaks align.
+
+[b]Artifact promotion:[/b] build artifacts in Actions can feed deploy steps or external registries via webhook—define whether promoted artifacts must come from protected branch pipelines only, matching Oh My Git instincts about not shipping unreviewed commits.
+
+[b]When things go wrong:[/b] jobs stuck “Waiting” mean no runner with label—register runner or fix YAML. Secrets not available on fork PRs is intentional—use separate workflows for internal branches. Mirror job success plus failed Actions often means two systems out of sync—developers push to canonical while mirror CI never runs.
 
 [b]Takeaway:[/b] treat outbound automation as part of your threat model—validate webhook sources, rotate tokens, and cap concurrent jobs so the host stays responsive for human developers.

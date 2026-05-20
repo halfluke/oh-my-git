@@ -15,14 +15,27 @@ mode = platform_theory
 
 [center][color=#0078d4]policy overrides[/color]  ·  inherit from project or set per branch[/center]
 
+[code]
+   direct push to main ──X──► policy blocks ref update
+   merge via completed PR ──✓──► allowed strategies only
+[/code]
+
 [description]
 
-[b]Branch policies[/b] attach to a branch name pattern in Azure Repos: they can require pull requests, minimum reviewers, optional automatic reviewers for paths, successful builds from a specified YAML pipeline, and linked work items for traceability. Unlike informal team norms, policies are enforced server-side—attempts to bypass via force-push should fail when configured correctly.
+[b]Branch policies[/b] in Azure Repos attach to branch name patterns (typically [code]main[/code] or [code]release/*[/code]) and enforce server-side rules before protected refs move—complementing the Git skills from Oh My Git where you learned that [code]git push --force[/code] rewrites history: here the server refuses if policy forbids force-push or direct commits.
 
-[b]Merge strategies:[/b] basic merge, squash, and rebase with fast-forward map to Git outcomes similar to other hosts; pick defaults that match your release archaeology needs.
+[b]Require pull requests:[/b] blocks pushes that would advance the protected branch without an active, completed PR. Minimum reviewer counts, required reviewers, and “prohibit merge until last vote is approve” mirror human review gates. Optional automatic reviewers by path approximate CODEOWNERS—files under [code]/security/[/code] might always summon the security Team.
 
-[b]Bypass permissions:[/b] emergency break-glass roles can bypass policies—treat as audited capability, not daily workflow.
+[b]Build validation:[/b] ties a specific Azure Pipeline YAML definition to policy: the PR must show a successful run from that pipeline before Complete. Misconfigured pipeline triggers ([code]pr:[/code] branches only) leave PRs red forever—match trigger paths to how teams branch ([code]feature/*[/code]).
 
-[b]Cross-service linkage:[/b] requiring work items ties Git activity to Boards items—great for compliance, painful if developers forget IDs; provide templates and CLI helpers.
+[b]Work item and comment gates:[/b] require linked Boards items for traceability; require comment resolution so review threads cannot linger unresolved. Great for regulated delivery; painful if developers forget IDs—provide branch naming templates and CLI helpers ([code]az boards work-item show[/code]).
 
-[b]Takeaway:[/b] treat policies as executable documentation: if the policy file does not match how the team really ships, either fix the process or simplify the policy to avoid shadow workflows.
+[b]Merge strategy policy:[/b] allow subset of basic merge, squash merge, rebase merge (fast-forward only). Squash produces one commit on [code]main[/code] like Oh My Git squash lessons; rebase+FF keeps linear history without merge nodes; basic merge preserves branch topology for archaeology.
+
+[b]Bypass and override permissions:[/b] Project Collection Administrators or explicitly granted bypass roles can override policy—treat as audited break-glass, not daily workflow. Policy inheritance from project settings vs per-branch overrides confuses audits: document which pattern you use.
+
+[b]Path filters and scope:[/b] optional policies can apply only when certain paths change—useful for [code]docs/**[/code] vs [code]src/**[/code] separation. Misconfigured globs either over-enforce (docs PRs require full QA pipeline) or under-enforce (security-sensitive paths merge without owners). Review glob diffs in policy change PRs the same way you review [code].gitattributes[/code]. Document exempt branches ([code]hotfix/*[/code]) in runbooks so on-call knows which policies still apply during incidents.
+
+[b]When things go wrong:[/b] teams sometimes enable every gate at once and wonder why nothing merges—stack policies incrementally. “Build queued but never started” usually means no available agents in the pool the YAML targets, not failing tests. Emergency fixes blocked by work-item links need a documented hotfix path or temporary policy exception with post-merge backfill. Path filter typos silently skip required reviewers—test policy diffs against sample PR file lists.
+
+[b]Takeaway:[/b] treat policies as executable documentation: if policy does not match how the team really ships, fix the process or simplify policy to avoid shadow workflows.

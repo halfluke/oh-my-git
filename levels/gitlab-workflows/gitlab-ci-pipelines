@@ -20,16 +20,33 @@ mode = platform_theory
 
 [center][color=#6b4fbb]artifacts · caches · environments · child pipelines[/color][/center]
 
+[code]
+   stages: [ build, test, deploy ]
+   build-job:
+     stage: build
+     script: [ npm ci, npm run build ]
+[/code]
+
 [description]
 
-[b]GitLab CI[/b] is configured in YAML checked into the repository. A [b]pipeline[/b] is created on push, MR, schedule, or web trigger; [b]stages[/b] order jobs; [b]needs:[/b] can build DAGs inside a stage for speed. Jobs run on [b]runners[/b] that poll for work—shared instance runners, group runners, or project-specific tokens on your hardware.
+[b]GitLab CI[/b] reads [code].gitlab-ci.yml[/code] from the repository (plus includes) to define pipelines: ordered [b]stages[/b], jobs within stages, and optional [code]needs:[/code] DAG edges for parallelism. Push, merge request, schedule, tag, or API triggers create pipelines that clone your Git ref—shallow or full—and execute scripts on [b]runners[/b] polling for jobs with matching tags.
 
-[b]Caches and artifacts:[/b] caches speed dependency installs; artifacts pass build outputs to downstream jobs or store test reports. Both consume disk—set expiry policies so shared runners do not fill.
+[b]Runners and executors:[/b] shared instance runners, group runners, or project-specific registration tokens attach to shell, Docker, Kubernetes, or custom executors. Tags in YAML ([code]tags: [ docker, amd64 ][/code]) must match runner configuration—jobs pending forever usually mean tag mismatch, not script failure.
 
-[b]Environments and deployments:[/b] jobs can target named environments with URLs and optional manual approvals. That maps release process to Git branches or tags while surfacing history in the UI.
+[b]Caches and artifacts:[/b] caches accelerate dependency installs with scoped keys; artifacts pass build outputs, test reports, and coverage to downstream jobs or external consumers. Set expiry—runners on self-managed instances fill disks without housekeeping.
 
-[b]Includes and components:[/b] large pipelines split across files with [code]include:[/code] and reusable [code]extends[/code] or component catalogs—treat them like libraries to avoid copy-paste YAML drift.
+[b]Environments and deployments:[/b] jobs target named environments with URLs, tier (staging/production), and optional manual approvals. Deployment history links Git SHAs to running services—pair with protected branches so only [code]main[/code] or release tags deploy to production.
 
-[b]Compared to GitHub Actions:[/b] different YAML shape and runner model, same idea: event-driven automation on the host that clones your repo and runs commands. Skills in writing idempotent scripts transfer.
+[b]Includes and components:[/b] split large YAML via [code]include:[/code] local/remote/project paths; reuse with [code]extends[/code] or CI component catalogs—treat shared snippets like libraries with version pins to prevent org-wide breakage.
+
+[b]MR vs branch pipelines:[/b] merge request pipelines test proposed integration; branch pipelines run on direct pushes. Branch protection must require the pipeline type that matches your merge policy—classic misconfiguration merges untested MRs.
+
+[b]Secrets and variables:[/b] project/group variables and masked protected variables inject credentials—never echo in job logs. Fork MRs should not expose protected variables; instance setting “Do not fork pipelines” or equivalent reduces exfiltration risk from malicious YAML.
+
+[b]Pipeline artifacts expiry and compliance:[/b] retain test reports and SBOM artifacts long enough for audit windows—self-managed disk fills when expiry is “never.” Align retention with tag retention on container registry images produced by deploy jobs.
+
+[b]Reviewing CI changes:[/b] treat MRs that edit [code].gitlab-ci.yml[/code] as high risk—require CODEOWNERS or platform team approval before granting fork contributors pipeline edit rights on shared runners. Diff CI YAML with the same scrutiny as auth middleware—[code]curl | bash[/code] in [code]before_script[/code] is still supply-chain risk inside your pipeline.
+
+[b]When things go wrong:[/b] pipeline succeeds but deploy job skipped because [code]only:[/code] legacy rules excluded branch—migrate to [code]rules:[/code]. Runner offline after OS patch—check GitLab admin runner list. Artifact too large fails upload—split outputs or use object storage backend tuning on self-managed. Protected variables missing on fork MR pipelines is intentional—run equivalent jobs on upstream branches before merge.
 
 [b]Takeaway:[/b] read pipelines as programs: stages are control flow, runners are machines, secrets are scoped credentials—never echo them to logs.

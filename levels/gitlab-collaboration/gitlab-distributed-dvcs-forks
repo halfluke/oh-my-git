@@ -15,14 +15,31 @@ mode = platform_theory
 
 [center][color=#fca326]“Allow commits from upstream members”[/color]  ·  maintainer pushes to fork branch[/center]
 
+[code]
+   git remote add upstream git@gitlab.com:group/upstream.git
+   git fetch upstream && git rebase upstream/main
+[/code]
+
 [description]
 
-[b]Forking on GitLab[/b] creates a full copy of the repository under another namespace so contributors can [code]git push[/code] without write access to the canonical project. The merge request then targets the upstream branch; permissions, pipelines, and secrets must be configured so untrusted forks cannot exfiltrate CI variables.
+[b]Forking on GitLab[/b] duplicates the repository into another namespace under your account or group so you can [code]git push[/code] without Maintainer access on the canonical project—then open a merge request targeting upstream [code]main[/code], the same integration pattern Oh My Git teaches with remotes, fetch, and merge/rebase before asking maintainers to integrate your work.
 
-[b]Merge request from fork:[/b] reviewers see the same diff-centric UI; the fork’s pipeline may run with reduced secrets. Many projects require a green pipeline on the fork branch before merge.
+[b]Merge request from fork:[/b] reviewers see diff, pipelines, and threads in the upstream project UI while commits live on fork refs until merge. Sync fork when upstream advances: fetch upstream, rebase or merge default into your branch, push to fork, MR updates automatically.
 
-[b]Shared runners on forks:[/b] instance administrators can disable or restrict shared runners for external forks to prevent crypto-mining abuse—expect slower feedback loops for drive-by contributors.
+[b]Pipeline trust on forks:[/b] merge request pipelines may run with reduced secrets—instance admins often disable shared runners for external forks to prevent crypto-mining or secret exfiltration via malicious [code].gitlab-ci.yml[/code] changes. Expect slower feedback for drive-by contributors; document how to run tests locally.
 
-[b]Internal forking:[/b] some enterprises fork inside the same top-level group for compliance boundaries; Git mechanics match public OSS, only ACLs differ.
+[b]Allow commits from upstream members:[/b] lets maintainers push fixes directly to contributor fork branches when rebases are messy—speeds collaboration without forcing MR authors to grant full repo access. Audit who can push; use branch protection on fork default branch anyway.
+
+[b]Internal forking:[/b] enterprises fork inside the same top-level group for compliance boundaries—Git mechanics match public OSS, only ACLs differ. Subscriptions and CI billing may still treat forks as separate projects.
+
+[b]Fork cleanup:[/b] stale forks accumulate storage; archive after merge. Rename upstream project and update clone URLs on all active forks.
+
+[b]Compared to same-repo branching:[/b] many internal teams skip forks and use protected [code]main[/code] plus MR-only feature branches—forks remain essential for external contributors without write access.
+
+[b]Confidential issues and forks:[/b] confidential upstream issues must not leak through fork MR descriptions or pipeline logs—review MR templates and CI output scrubbing when security-sensitive work flows through public fork pipelines with reduced secrets.
+
+[b]Credit and attribution:[/b] squash merge on upstream may collapse contributor authorship metadata—configure squash settings to preserve co-author trailers where community norms expect attribution across fork boundaries.
+
+[b]When things go wrong:[/b] MR pipeline pending forever on fork often means shared runners disabled for external contributors—maintainer must trigger pipeline or provide fork runner. “Permission denied” pushing to upstream is correct—retarget push to fork [code]origin[/code]. Huge MR conflicts after long-lived fork means painful rebase—sync early and often. Maintainer push to fork branch without comment confuses authors who rebased locally on stale tips.
 
 [b]Takeaway:[/b] treat fork MRs as partially trusted code execution: review diffs, cap CI secrets, and audit runner usage the same way you would for any external patch series.

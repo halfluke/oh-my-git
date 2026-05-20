@@ -16,16 +16,32 @@ mode = platform_theory
 
 [center][color=#6b4fbb]needs:[/color]  DAG jobs  ·  [color=#fca326]parallel/matrix[/color][/center]
 
+[code]
+   rules:
+     - if: $CI_PIPELINE_SOURCE == "merge_request_event"
+     - changes: [ src/** ]
+[/code]
+
 [description]
 
-[b]rules:[/b] replace legacy [code]only/except[/code] with expressive conditions: branch patterns, MR vs push, file changes, or manual pipelines. Fewer surprise runs means cheaper runners and clearer dashboards.
+Advanced GitLab CI uses [b]rules[/b], [b]include[/b], [b]child pipelines[/b], and [b]needs[/b] to keep feedback fast and YAML maintainable across hundreds of repos—still “run commands on Git objects cloned from remotes,” extending Oh My Git workflow ideas with enterprise-scale control flow.
 
-[b]include:[/b] centralize templates across hundreds of repos—watch versioning (pin to a tag or SHA) so a template edit cannot break every pipeline at once.
+[b]rules: replaces only/except:[/b] express when jobs run: branch patterns, MR vs push vs schedule, file paths via [code]changes:[/code], or manual [code]when: manual[/code]. Fewer surprise pipelines means cheaper runners and clearer MR widgets—miswritten rules skip tests entirely while merge stays green if protection does not notice.
 
-[b]Child / multi-project pipelines:[/b] [code]trigger[/code] launches separate pipelines (same repo or downstream) for modular systems; aggregate results back to the parent for MR gates.
+[b]include: templates across repos:[/b] centralize lint/test/deploy snippets from local paths, other projects, or remote URLs. Pin includes to tags or SHAs—floating [code]@main[/code] templates can break every pipeline simultaneously on Tuesday morning.
 
-[b]needs:[/b] builds a DAG inside a stage so tests start as soon as build artifacts exist—large speedups over strict stage waterfalls.
+[b]Child and multi-project pipelines:[/b] [code]trigger[/code] keyword launches separate pipelines (same repo modular monorepo or downstream project) with optional [code]strategy: depend[/code] to block parent until child completes—useful for microservice repos orchestrated from umbrella projects.
 
-[b]Caches and artifacts:[/b] scope caches per-branch or per-file to avoid poisoning; artifact expiry keeps disk predictable on self-managed instances.
+[b]needs: DAG within stages:[/b] jobs declare dependencies across stage boundaries where allowed, starting tests as soon as build artifacts exist instead of waiting for entire stage barriers—large wall-clock wins on monorepos.
 
-[b]Takeaway:[/b] advanced CI is still “run commands on Git objects”—invest in fast feedback on default branches and strict controls on fork pipelines.
+[b]Parallel matrix:[/b] [code]parallel: matrix[/code] fans jobs across OS, language versions, or shard indices—watch runner capacity; matrix explosion bills minutes fast on shared runners.
+
+[b]Caches and artifacts:[/b] scope caches with keys per branch or lockfile hash to avoid poisoning; set artifact expiry so self-managed disks do not fill. Pass reports as artifacts for merge request quality gates.
+
+[b]Workflow rules at scale:[/b] parent/child split keeps monorepo YAML readable—each service directory triggers its child pipeline via [code]rules:changes[/code], while parent orchestration gates release tags. Document dependency direction so teams know which pipeline ID branch protection must require.
+
+[b]Interruptible and resource groups:[/b] mark long jobs [code]interruptible: true[/code] so newer commits cancel stale work on busy branches—saves runners on rapid push loops during MR polish. [code]resource_group[/code] serializes deploy jobs to the same environment preventing overlapping production pushes. Combine with [code]workflow:rules[/code] to skip interruptible jobs on protected release tags where partial cancellation is unacceptable.
+
+[b]When things go wrong:[/b] parent pipeline green while child failed if [code]strategy: depend[/code] omitted—MR merges without real integration. [code]rules[/code] excluding [code]merge_request_event[/code] leave MRs untested—grep YAML during review. Remote include 404 breaks all projects referencing it—mirror templates internally. DAG cycles from mis-[code]needs[/code] fail pipeline compile with obscure errors—validate in CI lint jobs before merge.
+
+[b]Takeaway:[/b] advanced CI is still run commands on Git objects—invest in fast feedback on default branches and strict controls on fork pipelines.

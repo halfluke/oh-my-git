@@ -15,12 +15,27 @@ mode = platform_theory
 
 [center][color=#0078d4]cross-project feeds[/color]  ·  artifact visibility[/center]
 
+[code]
+   fork workflow:
+   upstream ──fork──► your copy ──PR──► upstream main
+[/code]
+
 [description]
 
-[b]Forks:[/b] contributors without Contribute on the canonical repo fork into their space, open a PR back—same social pattern as GitHub/GitLab. Clean up stale forks periodically.
+Azure Repos [b]forks[/b] let contributors without [i]Contribute[/i] permission on the canonical repository copy the project into their namespace, push branches there, and open a pull request back—same remote pattern Oh My Git teaches with [code]git remote add upstream[/code] and syncing before merge, except Azure creates the fork remote pairing in the UI.
 
-[b]Teams:[/b] map org structure to Azure DevOps groups; inherited permissions simplify admin but can over-grant—audit inherited vs explicit denies.
+[b]Fork lifecycle:[/b] create fork from the upstream repo page, clone both remotes locally ([code]origin[/code] = your fork, [code]upstream[/code] = canonical), branch, push, open PR targeting upstream default. Sync fork when upstream moves: merge or rebase upstream [code]main[/code] into your fork’s default locally, then push—conflicts resolve with normal Git tools, not Azure magic.
 
-[b]Repo vs project permissions:[/b] splitting microservices across repos within one project is common; cross-repo policies may need duplication unless templated.
+[b]Teams as ACL carriers:[/b] [b]Teams[/b] are Azure DevOps groups scoped to a project or organization. Add Teams to repo permissions with inherited roles (Reader, Contributor, Administrator). Org charts map cleanly to Teams; inherited allows simplify admin but can over-grant—review effective permissions and explicit denies when sensitive pipelines or service connections hang off the same project.
 
-[b]Takeaway:[/b] treat Teams + repo ACLs as code: review diffs when access widens, especially on shared service connections used by pipelines.
+[b]Repo vs project permissions:[/b] microservice layouts often use many repos inside one project. Each repo can set fork permissions, branch policies, and build validations independently—duplicate policy templates or use shared YAML in git to avoid drift. Cross-repo pipelines need artifact feed permissions scoped so project A cannot read secrets from project B.
+
+[b]Fork visibility and cleanup:[/b] stale forks accumulate object storage and confuse search; schedule archival or delete abandoned forks after PR merge. Private upstream repos produce private forks by default—verify before inviting external contributors.
+
+[b]Contributors vs readers:[/b] readers can clone and comment on PRs they can see; contributors push branches on repos they own access to. Never grant Contributor on production repos when fork + PR flow suffices for externals.
+
+[b]Artifact and pipeline coupling:[/b] forks inherit visibility rules on packages published from upstream pipelines—confirm whether CI artifacts from canonical builds are readable from fork contexts before debugging “package not found” in fork PR validation. Service connections used for deploy steps remain scoped to the project that owns them; fork PRs should not inherit production deploy rights by accident.
+
+[b]When things go wrong:[/b] “Cannot push to upstream” is almost always correct—push your fork, fix the PR source ref. “Permission denied opening PR” often means the fork lost sync with renamed default branch ([code]master[/code] → [code]main[/code]); update your local tracking branch and push again. Team inheritance surprises show up as unexpected pipeline rights—use the “security” view on a repo to see effective permissions, not just group membership lists.
+
+[b]Takeaway:[/b] treat Teams plus repo ACLs as code: review diffs when access widens, especially on shared service connections pipelines use to deploy.

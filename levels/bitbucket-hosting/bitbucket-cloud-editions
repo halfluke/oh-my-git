@@ -15,16 +15,29 @@ mode = platform_theory
 
 [center][color=#0052cc]Git[/color]  — same push/clone semantics across editions[/center]
 
+[code]
+   remote: git@bitbucket.org:workspace/repo.git
+   remote: https://bitbucket.org/workspace/repo.git
+[/code]
+
 [description]
 
-[b]Bitbucket Cloud[/b] tracks Atlassian’s SaaS roadmap: integrated pipelines, native Jira links, and marketplace apps. Teams choose it when they already live in Atlassian ID and want low ops.
+[b]Bitbucket Cloud[/b] is Atlassian’s SaaS forge integrated with Jira, Confluence, and Atlassian Identity: repositories live in workspaces, pipelines run from in-repo YAML, and marketplace apps extend review or security. Choose Cloud when you want Atlassian to operate upgrades, capacity, and regional hosting while Git remotes behave like any Oh My Git remote—[code]git clone[/code], branch, push, merge.
 
-[b]Bitbucket Data Center[/b] targets enterprises needing clustering, SAML, and data residency controls. Upgrade cadence and sizing guides differ from Cloud—capacity planning for Git storage and search indices matters.
+[b]Bitbucket Data Center[/b] targets enterprises needing clustered HA, SAML/LDAP, data residency, and advanced compliance. You operate nodes, shared search indexes, and Git storage sizing—clone storms and large monorepos stress both Git layer and UI search. Upgrade cadence and licensing differ from Cloud; verify feature parity before migration.
 
-[b]Server end-of-life:[/b] many orgs migrated Server installs to Cloud or Data Center; if you inherit old docs, verify which edition they reference—API paths and features diverge.
+[b]Server end-of-life:[/b] legacy Server installs often migrated to Cloud or Data Center. Inherited runbooks referencing Server REST paths or hook formats may be stale—confirm edition before debugging automation. Migration projects must remap users, permissions, and Jira app links, not just [code]git remote[/code] URLs.
 
-[b]Repositories and projects:[/b] Bitbucket groups repositories into [i]projects[/i] with permissions and hooks scoped per project or repo. Mirror GitHub’s org/repo mental model but read Atlassian’s permission names literally.
+[b]Projects and repositories:[/b] Bitbucket groups repos into [i]projects[/i] with permissions, default branch rules, and hooks scoped per project or repo. Workspace slug plus repo slug forms clone URLs—renames require developer remote updates.
 
-[b]Pipelines vs external CI:[/b] Bitbucket Pipelines is YAML in-repo; you can also wire Bamboo, Jenkins, or GitHub Actions elsewhere via webhooks—avoid double-triggering builds.
+[b]Pipelines vs external CI:[/b] Bitbucket Pipelines is YAML at repo root ([code]bitbucket-pipelines.yml[/code]); teams also wire Jenkins, Bamboo, or Circle via commit statuses and webhooks. Document single source of truth for green checks to avoid double builds or missing statuses on PRs.
 
-[b]Takeaway:[/b] edition choice is a compliance and billing decision; Git operations remain standard—focus migration risk on hooks, apps, and Jira field mappings.
+[b]Edition-specific sharp edges:[/b] Cloud minute quotas and IP allowlists differ from Data Center air-gapped runners. OAuth app registration flows vary; Jira dev panel integration must be re-linked after moves between editions.
+
+[b]Workspace administration:[/b] Cloud workspaces centralize billing, user seats, and default permissions for new repos. Data Center administrators manage internal user directories and replication factors. Document which edition your runbooks target before onboarding contractors—they may reference Cloud UI paths that do not exist on-prem.
+
+[b]Git LFS and large files:[/b] LFS billing and storage limits differ by edition; monorepos with binary assets need LFS policies aligned with clone scripts in CI. Regular [code]git gc[/code] on servers remains operator responsibility in Data Center—not Atlassian’s problem once code sits in your VPC.
+
+[b]When things go wrong:[/b] scripts hitting wrong API host ([code]api.bitbucket.org[/code] vs on-prem hostname) return confusing 404—parameterize base URL. Post-migration “permission denied” on push often means group mapping lost AD/LDAP sync. Double pipeline triggers usually mean both webhook and native YAML fire on the same push.
+
+[b]Takeaway:[/b] edition choice is compliance and billing; Git operations stay standard—focus migration risk on hooks, apps, and Jira field mappings.

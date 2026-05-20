@@ -21,16 +21,33 @@ mode = platform_theory
 
 [center][color=#0078d4]templates · extends · service connections[/color][/center]
 
+[code]
+   trigger:
+     branches:
+       include: [ main, release/* ]
+   pr:
+     branches:
+       include: [ main ]
+[/code]
+
 [description]
 
-[b]Azure Pipelines[/b] defines CI/CD in YAML checked into the repo (or classic UI definitions in older setups). [b]Stages[/b] group jobs; [b]jobs[/b] target agent pools; [b]steps[/b] run tasks (bash, PowerShell, marketplace tasks). Conditional logic, templates, and parameterization reduce copy-paste across microservices.
+[b]Azure Pipelines[/b] defines CI/CD in YAML checked into the repository—closer to Oh My Git’s workflow levels where automation reacts to pushes, but here the orchestrator lives in Azure DevOps. A run clones your repo (full or shallow), executes jobs on agents, publishes results back to PRs as build validation, and optionally deploys through gated environments.
 
-[b]Agents:[/b] Microsoft-hosted agents are convenient but generic; self-hosted pools give GPU access, private networks, and compliance boundaries at the cost of patching and trust. Agent authentication uses keys or PAT-like tokens—rotate on departure.
+[b]YAML structure:[/b] [b]stages[/b] group dependent work; [b]jobs[/b] target agent pools; [b]steps[/b] run tasks (bash, PowerShell, marketplace). Use [code]extends[/code] and templates to deduplicate microservice pipelines; pin template refs to tags or SHAs so org-wide edits cannot surprise every repo at once.
 
-[b]Environments and deployments:[/b] environments wrap deployment targets with approvals, branch filters, and checks (invoke REST gates, delay, etc.). They map human release process onto pipeline YAML.
+[b]Triggers and PR validation:[/b] [code]trigger[/code] and [code]pr:[/code] blocks decide which branch events enqueue runs—align them with branch policies requiring specific pipeline success on PRs. Missing [code]pr:[/code] triggers is a frequent reason PR gates stay red while CI on [code]main[/code] is green.
 
-[b]Service connections:[/b] store cloud credentials for deploy steps—scope narrowly (subscription + resource group) and audit usage.
+[b]Agents:[/b] Microsoft-hosted agents are convenient but generic images; self-hosted pools reach private networks, GPUs, and compliance enclaves at the cost of patching and trust. Agents authenticate with registration keys or PAT-like tokens—rotate on staff departure. Treat self-hosted agents as sensitive: they execute arbitrary PR code from forks unless restricted.
 
-[b]Artifacts:[/b] pipeline runs publish packages, symbols, and test results consumed by releases or other pipelines—set retention to control cost.
+[b]Environments and deployments:[/b] environments wrap deployment targets with approvals, branch filters, and checks (REST gates, delays). Map human release ceremony onto YAML: staging auto-deploys on [code]main[/code]; production waits for approver plus green smoke tests.
+
+[b]Service connections and artifacts:[/b] service connections store cloud credentials—scope narrowly to subscription plus resource group. Pipeline runs publish packages, symbols, and test results to Artifacts feeds; set retention policies to control storage cost.
+
+[b]Classic vs YAML pipelines:[/b] older classic UI-defined pipelines still exist in long-lived orgs—migrating to [code]azure-pipelines.yml[/code] in Git keeps pipeline changes reviewable in PRs alongside application code. Mixed models confuse branch policy build validation pointing at the wrong definition ID; inventory both types during audits.
+
+[b]OIDC and federated credentials:[/b] prefer workload identity federation over long-lived secrets in YAML where supported—tokens are short-lived and scoped to the pipeline run, reducing blast radius if a log leak occurs during fork experimentation.
+
+[b]When things go wrong:[/b] queued jobs that never start usually mean agent pool capacity zero or demands mismatch ([code]demands: docker[/code] on a pool without Docker). Fork PRs exfiltrating secrets happen when secret variables are available to builds from forks—disable or use manual approval for external contributions. “Template not found” after refactor means a broken [code]@main[/code] pin—use version tags.
 
 [b]Takeaway:[/b] treat agents like cattle in the cloud but pets on-prem: both need health checks, capacity planning, and secret hygiene.

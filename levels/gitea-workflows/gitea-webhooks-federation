@@ -17,14 +17,31 @@ mode = platform_theory
 
 [center][color=#00aa90]ActivityPub / federation[/color]  (where enabled)  ·  follow remote actors[/center]
 
+[code]
+   X-Gitea-Signature: sha256=...
+   payload: { action: "opened", pull_request: { ... } }
+[/code]
+
 [description]
 
-[b]Webhooks[/b] are the universal glue for small forges: your service receives JSON describing the event, verifies a shared secret or signature, and reacts. Keep handlers idempotent—GitLab/GitHub/Gitea may retry deliveries.
+[b]Webhooks[/b] are the primary integration spine on lightweight forges: repository settings register HTTPS endpoints that receive JSON when pushes, pull requests, issues, releases, or package events occur. Your service verifies [code]X-Gitea-Signature[/code] (or Forgejo equivalent), parses payload [code]action[/code], and reacts—notify chat, enqueue CI, sync tickets, trigger deploy.
 
-[b]Federation (optional/experimental):[/b] some forge directions explore ActivityPub-style following across instances; support and semantics evolve quickly—treat as beta unless your release notes say otherwise.
+[b]Handler design:[/b] respond with 2xx quickly; offload heavy work to queues. Retries duplicate deliveries—key operations by delivery ID or commit SHA plus event type. Timeouts cause exponential retry storms that look like DDoS from your own forge during deploy incidents.
 
-[b]API clients:[/b] REST endpoints mirror web features for issues and repos; token scopes should be minimal (classic PAT vs OAuth app) and rotated on staff changes.
+[b]REST API complement:[/b] webhooks announce events; API calls fetch authoritative state (PR diff, issue comments). Use scoped tokens with minimal permissions—classic PATs vs OAuth apps depending on instance version. Rotate on staff changes; audit token last-used metadata when available.
 
-[b]Cross-posting to GitHub:[/b] teams sometimes mirror canonical development to GitHub for visibility while authoring in Gitea—document which tracker is authoritative to avoid duplicate triage.
+[b]Built-in Actions vs external:[/b] when Actions enabled, some teams still webhooks to legacy Jenkins for exotic steps—document which system owns required merge statuses to avoid gaps or double builds.
+
+[b]Federation (optional):[/b] ActivityPub-style following across instances remains experimental in parts of the ecosystem—semantics and security models evolve; do not bet production release gates on federation without explicit operator commitment.
+
+[b]Cross-posting strategy:[/b] teams mirror canonical development to GitHub for visibility while authoring in Gitea—pick one issue tracker authority and link rather than duplicate triage. Git remotes can fan out; humans cannot resolve the same bug in two places without drift.
+
+[b]Chat and deploy integrations:[/b] Slack/Matrix/Discord bots often consume webhooks for PR opened/merged messages—keep messages concise with links back to forge URLs, not huge diffs.
+
+[b]Inbound security:[/b] expose webhook receivers only over TLS with IP allowlists where feasible; rate-limit public endpoints on small instances to avoid webhook-driven DoS during incident loops.
+
+[b]Replay and ordering:[/b] store last processed delivery ID or commit SHA per event type so redeploying listener code does not double-deploy production. Document expected event order—[code]pull_request.synchronized[/code] may arrive before [code]push[/code] depending on network timing. Health-check endpoints should not depend on forge connectivity—avoid circular alerts when Gitea is down and your bot tries to notify Gitea.
+
+[b]When things go wrong:[/b] silent CI means webhook secret rotated without updating listener—signature validation fails, events dropped. PR merge allowed without tests when webhook handler errors but branch protection only checks local Actions, not external CI—align protection with actual gates. Federation follow requests spam public instances—moderation policy needed on open signups. Listener OOM during burst merge hours drops deliveries—scale horizontally or queue internally.
 
 [b]Takeaway:[/b] outbound integrations should fail safe: timeouts, retries with backoff, and alerts when queues back up so silent webhook loss does not strand releases.

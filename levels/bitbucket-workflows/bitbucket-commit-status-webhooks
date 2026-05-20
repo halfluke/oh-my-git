@@ -15,10 +15,31 @@ mode = platform_theory
 
 [center][color=#0052cc]signatures · retries · idempotency[/color][/center]
 
+[code]
+   POST /rest/build-status/2.0/commits/{sha}
+   state: SUCCESSFUL | FAILED | INPROGRESS
+[/code]
+
 [description]
 
-Not every team uses Bitbucket Pipelines; many wire [b]commit statuses[/b] from external systems so PRs stay green/red consistently. Verify status context names so one pipeline does not clobber another.
+Many teams keep PRs in Bitbucket while running tests on Jenkins, CircleCI, Buildkite, or internal orchestrators. [b]Commit statuses[/b] are the glue: CI posts pass/fail/in-progress against a commit SHA; Bitbucket PR merge checks read those contexts before allowing merge—same social contract as green checks on other forges, but you own the integration code.
 
-[b]Webhooks:[/b] validate payloads with shared secrets; handle duplicate deliveries; respond quickly to avoid Bitbucket retry storms.
+[b]Posting statuses:[/b] REST APIs accept state, key, name, URL, and description for each context. Use stable key values ([code]ci/unit-tests[/code]) so reruns update the same slot instead of spawning duplicate required checks. Always target the SHA Bitbucket shows on the PR tip after rebases—stale statuses on old SHAs leave PRs red while local tests passed.
+
+[b]Required build statuses:[/b] branch permissions can require specific keys before merge. Align Jenkins job names or Circle contexts with policy literals—rename a job without updating Bitbucket settings blocks every merge until someone notices.
+
+[b]Webhooks outbound:[/b] Bitbucket POSTs JSON on push, PR, comment, and repo events to your HTTPS endpoints. Validate [code]X-Hub-Signature[/code] or shared secrets; reject unsigned payloads. Respond quickly with 2xx—slow handlers trigger retries that duplicate work if listeners are not idempotent.
+
+[b]Webhooks inbound patterns:[/b] receive PR opened → enqueue test job with clone URL and source branch; on completion post status. For fork PRs, treat code as untrusted: run in isolated agents without secrets, mirroring caution from Oh My Git fork workflows.
+
+[b]Idempotency and ordering:[/b] events may arrive out of order or twice; key handlers by [code](event_type, commit_sha, delivery_id)[/code]. Deployment webhooks should tolerate duplicate “merged” notifications without double production deploys.
+
+[b]Observability:[/b] log delivery failures, alert when status posting fails silently, dashboard webhook error rates. Glue code is production infrastructure—not a one-off script on someone’s laptop.
+
+[b]Local development hooks:[/b] developers running [code]git push[/code] to feature branches trigger the same webhooks as merge events—ensure staging listeners filter events so every push does not deploy to shared environments. Use branch filters in listener logic ([code]refs/heads/main[/code] only for deploy).
+
+[b]Status aggregation:[/b] monorepos may post many contexts ([code]frontend/test[/code], [code]backend/test[/code]); branch permissions should require all mandatory contexts, not “any green.” Document which contexts are informational versus blocking for reviewers.
+
+[b]When things go wrong:[/b] PR shows no checks because CI posted to fork commit SHA while Bitbucket displays merge commit preview differently—read PR “Commits” tab for authoritative hash. Webhook retry storms happen when endpoint returns 500 under load—fix quickly or disable hook temporarily with comms. Merge allowed despite red CI means branch permission forgot to require that context—policy gap, not Git bug.
 
 [b]Takeaway:[/b] glue code is part of the product—monitor webhook failure rates and alert before merges silently lose checks.

@@ -17,12 +17,28 @@ mode = platform_theory
 
 [center][color=#0052cc]dev panel[/color]  links branches · commits · builds[/center]
 
+[code]
+   PROJ-123 #resolve #comment merged via PR-42
+[/code]
+
 [description]
 
-[b]Smart commits:[/b] embed Jira keys and verbs in Git messages so transitions fire on push—powerful and easy to typo. Document allowed verbs and train contributors; regex misconfiguration can move wrong tickets.
+[b]Smart commits[/b] turn Git commit messages into Jira automation: include an issue key plus verbs like [code]#comment[/code], [code]#time[/code], [code]#resolve[/code], or [code]#in-progress[/code] and Bitbucket’s integration may transition workflow states, append comments, or log work time when the push lands. Power comes with foot-guns—typos become unintended API calls on the wrong ticket.
 
-[b]PR ↔ Jira:[/b] linking PRs to issues keeps QA and release notes coherent; branch policies can require a linked issue before merge in some setups.
+[b]Issue keys as anchors:[/b] keys like [code]PROJ-123[/code] identify work items across branches, commits, PR titles, and pipeline metadata. Convention: embed keys in branch names ([code]feature/PROJ-123-login-fix[/code]) so dev panel filters stay readable. Real linkage still flows through Atlassian integration metadata, not naming alone.
 
-[b]Cross-product permissions:[/b] users need correct roles in both Bitbucket and Jira; “works in Git” but “missing in dev panel” is usually ACL or app link drift.
+[b]PR ↔ Jira linkage:[/b] open PRs from branches containing keys or manually link issues in the UI. Merged PRs can auto-close or transition issues when merge checks pass—configure carefully so draft or abandoned PRs do not resolve production bugs prematurely. QA and release notes stay coherent when every merged change maps to a ticket.
 
-[b]Takeaway:[/b] treat keys in messages as API calls—review them in CI if you need strict traceability for compliance.
+[b]Smart commit grammar:[/b] document allowed verbs for your project; restrict regex breadth in Jira automation so partial matches ([code]MOCK-1[/code] inside [code]PROJ-123[/code]) do not fire. Train contributors: smart commits execute on push—amending and force-pushing re-triggers behavior you may not expect.
+
+[b]Permissions across products:[/b] users need correct roles in Bitbucket and Jira; “push succeeded” but “dev panel empty” usually means OAuth app scope drift, missing Jira license, or user lacks browse permission on the linked project.
+
+[b]Branch policies and merge gates:[/b] some setups require a linked Jira issue before merge—pairs Bitbucket branch permissions with product governance. Balance compliance against hotfix latency with documented bypass roles.
+
+[b]Release and deployment tabs:[/b] when Bitbucket Deployments report environment status, Jira issues can show what build reached staging versus production—valuable for change advisory boards if naming stays consistent ([code]staging[/code], [code]production[/code]). Deployment records complement Git tags: a tag marks a commit; deployment marks where it ran.
+
+[b]Hygiene for squashed history:[/b] squash merges collapse PR commits; ensure the final squash message still carries the Jira key so smart commits and dev panel linkage survive after linearizing history on [code]main[/code].
+
+[b]When things go wrong:[/b] tickets jump to Done because someone typed [code]#resolve[/code] in a WIP commit message—use [code]#comment[/code] until merge, or disable risky verbs in training branches. Worklogs duplicated when developers replay cherry-picks mean the same [code]#time[/code] line hit multiple pushes—prefer logging time in Jira directly for fuzzy work. Dev panel shows PR from wrong project when keys collide across Jira projects—enforce unique key prefixes org-wide.
+
+[b]Takeaway:[/b] treat keys in messages as API calls—review them in CI or PR templates if you need strict traceability for compliance.

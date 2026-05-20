@@ -15,16 +15,31 @@ mode = platform_theory
 
 [center][color=#00aa90]LFS · attachments · release binaries[/color]  live beside Git storage[/center]
 
+[code]
+   mirror cron: pull from upstream every 30m
+   deploy key:  read-only clone for CI
+[/code]
+
 [description]
 
-[b]Repository model:[/b] each repository has its own permission matrix: collaborators, teams, deploy keys, and branch/tag protection. Inherited org permissions reduce click-work but can accidentally grant broad access—review inheritance when repos move between owners.
+Each Gitea [b]repository[/b] combines bare Git storage with issues, releases, wiki, and settings scoped to that unit—permissions matrix includes collaborators, team roles, deploy keys, and branch/tag protection independent of sibling repos under the same organization.
 
-[b]Mirroring:[/b] Gitea can pull from or push to another Git remote on a schedule—useful for read-only mirrors of GitHub/GitLab sources or for fan-out to a public copy. Conflicts still resolve with normal Git rules; the mirror job only automates fetch/push.
+[b]Collaborator and team ACLs:[/b] grant read, write, or admin explicitly or via org teams with inheritance. Moving a repo between owners re-evaluates inherited grants—audit after transfers. Admin is not daily merge duty; protected branches should still require PRs for [code]main[/code].
 
-[b]Issues and kanban:[/b] lightweight boards attach to milestones; automation is simpler than Jira-sized products but enough for many OSS teams. Webhooks fire on push, issues, PR events for integration with chat or external CI.
+[b]Deploy keys:[/b] per-repo SSH keys for automation—prefer read-only keys for CI clone unless a bot must push tags. Rotate keys when staff rotate; document which pipeline uses which key to avoid surprise lockouts during incident response.
 
-[b]Backups:[/b] snapshot the database plus repo bare paths and LFS/object storage. Test restore; Git-only mirrors are not sufficient if you care about issue text.
+[b]Branch and tag protection:[/b] block force-push, require PRs, optionally require signed commits or status checks from webhooks. Tag protection prevents accidental [code]v1.0.0[/code] moves—pair with release workflow docs so maintainers know who may create annotated tags.
 
-[b]Scaling:[/b] horizontal scaling patterns differ by deployment; consult current docs for repository sharding and caching when many concurrent clones hit the same instance.
+[b]Mirroring:[/b] scheduled pull mirrors fetch upstream GitHub/GitLab/Gitea sources; push mirrors fan out public copies. Conflicts on push mirrors need human Git resolution—mirrors do not merge divergent histories automatically. Clearly mark mirror repos read-only in description to prevent drive-by issues on stale code.
 
-[b]Takeaway:[/b] Gitea shines when ops burden must stay small—document your backup and upgrade path the day you install, not the day before an outage.
+[b]LFS and attachments:[/b] large binaries live outside normal object store paths—backup plans must include LFS content and attachment storage, not just [code]git clone[/code] mirrors.
+
+[b]Issues and kanban:[/b] milestones and labels give lightweight planning; webhooks fire on push, issues, and PR events for chat or external CI integration. Simpler than Jira-scale workflow—document conventions instead of encoding everything in custom fields.
+
+[b]Release attachments:[/b] attach binaries to releases alongside annotated tags—download counts and checksum files live in forge metadata. Tag signing and [code]git verify-tag[/code] remain local Git operations; upload integrity is separate from commit signing.
+
+[b]Instance settings affecting every repo:[/b] global disabled actions, max repo size, and attachment limits are administrator knobs—repo owners see mysterious failures when instance quota triggers before per-repo settings do.
+
+[b]When things go wrong:[/b] mirror “success” with missing tags often means mirror settings exclude tags or shallow fetch depth too small—increase depth or disable partial mirror options. Writers surprised by push rejections usually hit branch protection—use PR flow. Backup restore missing issues means you restored Git trees but not database dump—test full restore quarterly. Deploy key with write access compromised requires rotation on every repo that trusted it.
+
+[b]Takeaway:[/b] Gitea shines when ops burden must stay small—document backup and upgrade path the day you install, not the day before an outage.

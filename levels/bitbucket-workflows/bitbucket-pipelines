@@ -22,16 +22,31 @@ mode = platform_theory
 
 [center][color=#0052cc]minutes quotas · Docker service containers[/color][/center]
 
+[code]
+   pipelines:
+     pull-requests:
+       '**':
+         - step: *run-tests
+[/code]
+
 [description]
 
-[b]Bitbucket Pipelines[/b] runs containerized steps declared in YAML at the repository root. Each step picks a Docker image, runs script sections, and can declare caches, artifacts, and deployment steps. Shared infrastructure enforces minute quotas—optimize with dependency caching and parallel steps where supported.
+[b]Bitbucket Pipelines[/b] runs CI/CD from [code]bitbucket-pipelines.yml[/code] at the repository root: each [i]step[/i] selects a Docker image, runs script sections, and can declare caches, artifacts, parallel steps, and deployment environments. Events—push, PR, tag, custom—enqueue runs that clone the repo (respecting depth settings) and report build status back to PRs for merge gating, much like automation topics in Oh My Git tied to remotes and branches.
 
-[b]Services:[/b] auxiliary containers (databases, emulators) can run beside the main step container for integration tests—similar in spirit to GitHub Actions service containers.
+[b]Step design:[/b] define reusable YAML anchors for lint, test, and build. Pin images ([code]image: node:20-bookworm[/code]) for reproducibility; [code]definitions.caches[/code] speed dependency installs. Artifact stanzas pass binaries between steps or to deployment downloads—set size limits to avoid quota surprises.
 
-[b]Deployments:[/b] map steps to environments with manual gates for production; track release history alongside Jira versions when integrated.
+[b]Pull request pipelines:[/b] [code]pull-requests[/code] pipelines run on PR tips—critical for branch permissions requiring green builds. Without PR triggers, only default-branch pushes test while contributors see red merge buttons. Scope branch patterns to avoid running heavy e2e on every docs typo when paths filters exist.
 
-[b]Secrets:[/b] repository and deployment variables should be scoped narrowly; rotation requires coordination with anyone embedding tokens in YAML (prefer injected vars over literals).
+[b]Service containers:[/b] auxiliary databases or emulators run beside the main step container for integration tests—declare [code]services:[/code] with health checks so scripts wait for Postgres readiness. Similar pattern to service containers elsewhere; watch memory on small runners.
 
-[b]Alternatives:[/b] many teams attach external CI (Bamboo, Circle, Jenkins) via webhooks while keeping PRs in Bitbucket—document the source of truth for green checks.
+[b]Deployments and environments:[/b] map steps to [code]deployment: production[/code] with manual triggers for sensitive targets. Track release history alongside Jira versions when integrated. Separate variables per environment—never inject production tokens into PR builds from forks; use restricted deployment permissions.
+
+[b]Minutes and parallelism:[/b] Cloud plans meter build minutes; parallel steps multiply consumption. Cache dependencies aggressively; split fast PR checks from nightly heavy suites. Self-hosted runners (where available) move compute inside your network for compliance.
+
+[b]Custom pipeline triggers:[/b] [code]custom[/code] pipelines and [code]manual[/code] steps support on-demand deploy and maintenance windows—pair with branch permissions so only release managers can fire production custom pipelines. Tag pipelines ([code]tags: v*[/code]) should build immutable release artifacts referenced by deployment steps.
+
+[b]OIDC cloud deploy:[/b] Cloud OIDC providers let pipelines assume short-lived cloud roles without static keys in repository variables—prefer over checked-in credentials when Bitbucket and your cloud vendor support the integration pattern.
+
+[b]When things go wrong:[/b] “Build not run on PR” means missing [code]pull-requests[/code] section or path exclude matched everything. Cache poisoning shows up as flaky passes—bust cache keys when lockfiles change. Fork PRs failing instantly on secrets mean secured variables leaked into build scripts—use default restricted variables and audit logs. Custom pipeline triggered twice on tag push and branch push—dedupe triggers in YAML.
 
 [b]Takeaway:[/b] treat pipeline YAML like application code: review changes, pin images, and test forks from untrusted contributors in isolated workspaces.

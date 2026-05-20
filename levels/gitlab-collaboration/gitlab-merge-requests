@@ -20,16 +20,30 @@ mode = platform_theory
 
 [center][color=#fca326]merge train[/color] (optional)  ·  serializes merges on a moving target[/center]
 
+[code]
+   draft MR ──► ready ──► approved ──► merge (if pipeline green)
+[/code]
+
 [description]
 
-A [b]merge request[/b] is GitLab’s review and integration object: it references source and target branches, carries diffs, threads, approvals, and pipeline status. You can require approval rules by branch, code owners paths, or number of reviewers. [b]Draft[/b] MRs signal WIP; pushing new commits refreshes the diff and re-runs pipelines tied to the MR.
+A GitLab [b]merge request[/b] (MR) is the review and integration object: source branch, target branch, diff, discussions, approval rules, labels, and pipeline status before protected refs advance. Git underneath still does fast-forward, merge commit, or squash—Oh My Git merge skills apply; GitLab adds policy, threads, and automation metadata until merge executes.
 
-[b]Merge strategies:[/b] fast-forward only, merge commit with or without semi-linear history, and squash merge mirror GitHub’s menu—policy is per project or inherited from the group. Squash commit messages can carry the MR title for readable history.
+[b]Opening and iterating MRs:[/b] push feature branch, open MR via UI or [code]glab mr create[/code], assign reviewers. Draft MRs signal WIP; new commits refresh diff and re-run MR pipelines. Use description templates linking issues ([code]Closes #123[/code]) for auto-close on merge when configured.
 
-[b]Merge trains:[/b] on busy default branches, trains queue MRs that passed pipeline on their tip, then validate each candidate against the hypothetical result of merging everything ahead in the train—reducing “green on branch, red after merge” surprises at the cost of latency and runner minutes.
+[b]Approval rules:[/b] require N approvals, specific Code Owner paths, or security team sign-off on sensitive globs. “Prevent approval by author” and “require maintainer approval” reduce self-merge accidents. Resolved discussions can be required before merge.
 
-[b]Forking vs same-repo branches:[/b] GitLab supports both external forks (like GitHub) and in-repo feature branches with protected [code]main[/code]. Many internal teams skip forks entirely and rely on branch protections plus MR-only merges.
+[b]Merge strategies:[/b] fast-forward only enforces linear history; merge commit preserves branch nodes; squash merge collapses MR into one commit (title often becomes message). Semi-linear preferences combine rebase before merge—adjust per project to match archaeology culture.
 
-[b]Security scans in MR widgets:[/b] SAST/dependency scanning can annotate the MR diff. Those results are product metadata; they do not change Git blob hashes.
+[b]Merge trains:[/b] on busy default branches, trains queue MRs that passed pipeline on their tip, validating each against hypothetical merge of everything ahead—reducing “green on branch, red after merge” surprises at cost of latency and runner minutes. Premium feature on some tiers—know your license.
+
+[b]MR pipelines vs branch pipelines:[/b] MR pipelines test merge-result semantics; branch pipelines run on push to branch. Branch protection should reference the pipeline type that actually gates merge—misconfiguration leaves MRs mergeable without realistic integration tests.
+
+[b]Security scanning widgets:[/b] SAST, dependency, and secret detection annotate diffs—product metadata atop Git blobs, useful for reviewers, not a substitute for human judgment.
+
+[b]Merge when pipeline succeeds:[/b] optional auto-merge reduces queue latency when policies trust automation—still require approval rules so humans do not sleep through risky diffs. Auto-merge aborts if target branch moves and pipeline must re-run.
+
+[b]Cherry-pick and backport MRs:[/b] GitLab can cherry-pick merged MRs to stable branches via new MRs—prefer this over manual cherry-pick pushes to protected release branches without review, keeping the same MR gate discipline on maintenance lines.
+
+[b]When things go wrong:[/b] MR stuck “cannot merge” with rebased target means someone merged ahead—press rebase button or rebase locally. Merge train failures cascade—check first failing MR in train, not just yours. Approval dismissed after new pushes when “reset approvals on push” enabled—re-request review intentionally. Semi-linear merge settings reject merge commits from hotfix branches—align hotfix process with allowed merge method.
 
 [b]Takeaway:[/b] MRs are where human policy meets the graph—learn branch protections, approval rules, and pipeline gates as one system.

@@ -17,14 +17,32 @@ mode = platform_theory
 
 [center][color=#0052cc]minimum approvals · default reviewers[/color][/center]
 
+[code]
+   states:  OPEN → APPROVED (N) → MERGED
+            ↑              ↑
+       draft optional   build status + permissions
+[/code]
+
 [description]
 
-Bitbucket [b]pull requests[/b] parallel other forges: diff, comments, tasks, and required builds before merge. [b]Branch permissions[/b] can restrict who pushes directly, who can merge, and whether fast-forward is required—combine with pipeline gates to prevent accidental history rewrites.
+A Bitbucket [b]pull request[/b] is the review and merge gate: source branch, target branch (usually default), computed diff, comments, tasks, approvers, and build statuses before anyone moves a protected ref. Git mechanics match Oh My Git merge lessons—merge commit, squash, or fast-forward—but Bitbucket stores conversation and approval state outside the object database until merge executes.
 
-[b]Fork vs branch workflows:[/b] public OSS often uses forks; internal orgs may use branch-only flows with strict default branch protection. Fork PRs still end as Git merges on the target.
+[b]Opening and updating PRs:[/b] push a topic branch, create PR via UI or REST, add reviewers and description. Further [code]git push[/code] updates the diff tip automatically. Use PR tasks for checklist items reviewers must acknowledge before merge.
 
-[b]Build status integration:[/b] pipelines publish build badges consumed by PRs; third-party CI can integrate via commit statuses if configured.
+[b]Branch permissions:[/b] restrict who may push directly to [code]main[/code], who may merge without review, and whether fast-forward-only merges are required. Combine with required build statuses so green checks and human approvals both gate the merge button—mirroring protected branch concepts you practiced locally, enforced server-side.
 
-[b]Large diffs:[/b] performance settings and shallow clones help reviewers; etiquette (smaller MRs) still dominates perceived velocity.
+[b]Default and required reviewers:[/b] repository or project settings can assign default reviewers by glob on changed paths. Minimum approval counts block merge until satisfied. Request changes (where enabled) signals rework before another approval round.
 
-[b]Takeaway:[/b] read Bitbucket’s merge checks as code+policy: Git proves the graph, Bitbucket enforces who may move protected refs.
+[b]Merge strategies:[/b] merge commit preserves branch topology; squash condenses PR history into one commit on base; fast-forward keeps linear history when policy allows. Pick defaults matching release archaeology needs—squash simplifies [code]git log main[/code]; merge commits preserve branch context for bisect.
+
+[b]Fork vs in-repo branching:[/b] public OSS often uses forks with PRs upstream; internal teams may branch inside one repo with strict default-branch locks. Fork PRs still end as Git merges on the target; sync your fork before review to minimize conflict noise.
+
+[b]Build status integration:[/b] Bitbucket Pipelines and third-party CI publish commit statuses consumed by PR merge checks. Name status contexts distinctly ([code]ci/unit[/code] vs [code]ci/e2e[/code]) so one pipeline does not clobber another’s signal.
+
+[b]PR destination and refs:[/b] choose target branch explicitly—[code]main[/code], [code]develop[/code], or release branch. Bitbucket tracks source and destination refs separately from local [code]@{u}[/code] habits; after retargeting a PR, rerun CI against the new merge base. Declined PRs leave branch refs intact unless you delete them—groom stale branches to reduce clone noise.
+
+[b]Review etiquette at scale:[/b] request reviewers early on draft PRs for architectural feedback while CI stabilizes. Use description templates linking design docs; Bitbucket renders markdown but huge images bloat review load.
+
+[b]When things go wrong:[/b] “Cannot merge: insufficient approvals” with silent default reviewers means path globs did not match changed files—check reviewer rules. Build stuck pending often means external CI never posted status to the commit SHA Bitbucket expects after a rebase—re-run CI on latest tip. Huge diffs slow UI; split PRs beats tweaking performance knobs alone.
+
+[b]Takeaway:[/b] read Bitbucket merge checks as code plus policy: Git proves the graph, Bitbucket enforces who may move protected refs.

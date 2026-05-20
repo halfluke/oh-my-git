@@ -17,14 +17,31 @@ mode = platform_theory
 
 [center][color=#0052cc][b]Atlassian[/b][/color]  identity + permissions bridge both products[/center]
 
+[code]
+   branch: feature/PROJ-123-short-name
+   commit: PROJ-123 #comment explain fix
+[/code]
+
 [description]
 
-[b]Bitbucket Cloud[/b] today sits inside the Atlassian cloud ecosystem next to Jira Software and Confluence. The [i]development panel[/i] on a Jira issue lists linked branches, commits, and pull requests from Bitbucket when integrations and permissions align—giving planners a view into engineering progress without opening Git directly.
+The Jira [i]development panel[/i] surfaces Bitbucket branches, commits, pull requests, and deployment information on an issue when Atlassian integration, permissions, and issue keys align—giving planners visibility into engineering progress without opening Git directly. Underneath, Git remains authoritative for file contents; Jira tracks workflow; Bitbucket is the bridge storing PR metadata and hosting bare repos.
 
-[b]Smart commits:[/b] commit messages may reference issues ([code]PROJ-123 #comment[/code] patterns) to transition workflow states—behavior is configurable and can surprise teams if regexes are too loose.
+[b]What the dev panel shows:[/b] linked branches (often discovered via issue key in branch name), commits referencing keys, open and merged PRs, and build/deploy badges when pipelines and deployment tracking are configured. Stale entries linger if branches were deleted without merge—groom links during sprint close.
 
-[b]Jira alignment:[/b] issue keys in branch names are convention; real linkage comes from integration metadata and API calls. Keep naming discipline so automation does not attach the wrong issue.
+[b]Smart commits and transitions:[/b] commit messages like [code]PROJ-123 #comment fixed edge case[/code] can append Jira comments or transition states on push. Behavior is configurable; loose regex causes accidental transitions—treat message text like API input, similar to careful commit messages in Oh My Git history rewriting lessons.
 
-[b]Permissions coupling:[/b] Atlassian accounts, site access, and Bitbucket project permissions interact—debugging “can’t see PR in Jira” often traces to OAuth app scopes or user not having both product licenses.
+[b]PR linkage:[/b] create PRs from keyed branches or link manually. Merge can transition issues to Done or add release comments when automation is enabled. Coordinate with QA so “In Review” and “Done” states match actual deployment, not just merge click.
 
-[b]Takeaway:[/b] treat Git as the source of truth for code, Jira as workflow truth for product intent, and Bitbucket as the bridge—when the bridge misconfigures, neither side lies, they just disagree.
+[b]OAuth and app links:[/b] Atlassian Cloud connects Bitbucket and Jira via OAuth applications and site settings. Users need licenses and browse permissions on both products—debugging “PR missing on issue” often traces to user not in Bitbucket project or app reinstall after token rotation.
+
+[b]Deployment visibility:[/b] when Bitbucket Deployments or integrated CI reports environment status, Jira can show what build reached staging vs production—valuable for change management if teams maintain environment naming discipline.
+
+[b]Single source of truth:[/b] decide whether Jira issue description or Bitbucket PR description owns acceptance criteria—duplication diverges quickly. Link between them instead of copy-pasting specs.
+
+[b]Build and deployment tabs:[/b] pipeline integrations populate build status on issues when commit statuses and deployment records are wired—planners see red/green without opening Bitbucket. Failed builds linked to issues accelerate “what broke this sprint?” conversations during retrospectives.
+
+[b]Branch naming automation:[/b] Jira can suggest branch names from issue keys—reduces typos that break dev panel discovery. Still verify the created branch tracks the correct remote; local-only branches never appear in the panel.
+
+[b]When things go wrong:[/b] dev panel empty despite visible PRs usually means issue key mismatch ([code]proj-123[/code] vs [code]PROJ-123[/code] sensitivity settings) or integration paused after admin change. Smart commits firing twice after rebase-and-force-push confuse auditors—prefer squash merge or amend locally before first push to shared remote.
+
+[b]Takeaway:[/b] treat Git as source of truth for code, Jira as workflow truth for product intent, and Bitbucket as the bridge—when the bridge misconfigures, neither side lies, they just disagree.

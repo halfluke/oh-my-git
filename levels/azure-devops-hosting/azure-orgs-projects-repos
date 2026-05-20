@@ -16,14 +16,28 @@ mode = platform_theory
 
 [center][color=#0078d4][b]Azure Repos[/b][/color]  is Git hosting inside a project[/center]
 
+[code]
+   clone URL patterns:
+   https://dev.azure.com/{org}/{project}/_git/{repo}
+   git@ssh.dev.azure.com:v3/{org}/{project}/{repo}
+[/code]
+
 [description]
 
-[b]Organization[/b] is the billing and identity boundary in Azure DevOps: users, groups, and policies can be managed at org scope. [b]Projects[/b] partition work: each project typically hosts Git repositories under [b]Azure Repos[/b], work tracking on [b]Boards[/b], builds/releases under [b]Pipelines[/b], and optional [b]Artifacts[/b] feeds.
+The [b]organization[/b] is Azure DevOps’ billing, identity, and cross-project administration boundary—users, organization-level groups, and shared policies live here. A [b]project[/b] partitions work for a product or program: inside it you typically find [b]Azure Repos[/b] (Git), [b]Boards[/b] (work items), [b]Pipelines[/b] (CI/CD), [b]Test Plans[/b], and [b]Artifacts[/b] feeds. Git itself remains familiar: commits, branches, remotes, and merges behave like Oh My Git drills; only URLs and permissions differ.
 
-[b]Remote URLs:[/b] cloning shows hostnames under [code]dev.azure.com[/code] or on-premises Azure DevOps Server collection URLs. Git behavior is unchanged; PATs or SSH keys authenticate like other hosts.
+[b]Azure Repos as Git hosting:[/b] each repo is a bare store plus forge metadata (PRs, policies). Clone with HTTPS and a PAT or SSH keys registered under User Settings → SSH public keys. Rename a repo and every developer must update [code]git remote set-url origin …[/code]—Git does not follow redirects silently.
 
-[b]Repo limits and naming:[/b] large monorepos are supported but watch LFS, sparse checkout, and CI checkout depth to keep agents fast. Repo renames require updating remotes on all clones.
+[b]Remote URL anatomy:[/b] hostnames use [code]dev.azure.com[/code] or on-premises Azure DevOps Server collection URLs. Project name appears in the path; typos in project or repo segment cause 404 on push though auth may succeed elsewhere—copy URLs from the portal.
 
-[b]Cross-project dependencies:[/b] multi-repo pipelines and artifact feeds exist—design permissions so a pipeline in project A cannot exfiltrate secrets from project B unintentionally.
+[b]Scaling repos inside a project:[/b] monorepos are supported; watch LFS usage, sparse checkout for giant trees, and shallow [code]git clone --depth[/code] in pipelines to keep agents fast. Many small repos simplify permissions per service but multiply policy duplication—choose consciously.
 
-[b]Takeaway:[/b] memorize the hierarchy org → project → repo before debugging “where did my permission go?”—inheritance is powerful and easy to misread.
+[b]Permissions inheritance:[/b] project-level groups inherit to repos unless overridden. Pipeline service accounts often need Contributor on repos they build and Reader on feeds they consume—mis-scoping shows up as “pipeline cannot push tag” while humans can.
+
+[b]Cross-project dependencies:[/b] multi-repo pipelines, artifact feeds, and git submodules span project boundaries. Design service connections with least privilege so a pipeline in project A cannot deploy into subscription resources owned by project B without review.
+
+[b]Default branch and tags:[/b] Azure Repos exposes default branch settings separate from local [code]HEAD[/code] symref habits—renaming default branch requires updating branch policies, pipeline triggers, and every developer’s [code]origin/HEAD[/code] tracking. Tag permissions can be restricted independently; release engineers should tag from protected branches only after merge completes, not from local divergent tips.
+
+[b]When things go wrong:[/b] “where did my permission go?” usually traces org → project → repo inheritance, not malicious admin. Clones work but pushes fail when PAT scopes omit [i]Code (read & write)[/i]. CI checkout of the wrong repo often means the pipeline YAML still references an old repo name after rename—grep your templates after migrations. SSH works for humans but CI fails when service account lacks project membership on newly split repos.
+
+[b]Takeaway:[/b] memorize the hierarchy org → project → repo before debugging access—inheritance is powerful and easy to misread.

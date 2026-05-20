@@ -18,14 +18,27 @@ mode = platform_theory
 
 [center][color=#0078d4]queries · dashboards · notifications[/color][/center]
 
+[code]
+   commit message:  fix(auth): handle timeout PROJ-123
+   branch policy:   require linked work item on PR
+[/code]
+
 [description]
 
-[b]Azure Boards[/b] tracks work items independently from Git, then links them via IDs, mentions, and branch policies. A [i]process template[/i] (Agile, Scrum, CMMI, or custom) defines work item types and transitions—changing templates later is painful, so choose deliberately at project creation.
+[b]Azure Boards[/b] tracks product intent separately from Git objects, then binds them through IDs, mentions, branch policies, and build integration. Commits remain the ledger in Oh My Git terms; work items describe [i]why[/i] a change exists. A [i]process template[/i] (Agile, Scrum, CMMI, or custom) defines work item types, states, and transitions at project creation—changing templates later is painful, so choose deliberately.
 
-[b]Backlogs and boards:[/b] product backlogs order epics/features; sprint boards track iteration scope. Dragging cards updates state machines—ensure WIP limits and definitions of done are social agreements, not just UI columns.
+[b]Work item anatomy:[/b] each item has a numeric ID, type, state, assigned owner, iteration path, area path, and links to parent/child items. Epics roll up features; user stories break into tasks. Bugs can flow through their own states. Custom fields appear on forms and in WIQL queries—avoid field sprawl nobody maintains.
 
-[b]Traceability:[/b] linking builds and commits to work items helps regulated industries; it also adds friction if developers must juggle IDs. Balance with templates and branch naming guidance.
+[b]Backlogs and sprint boards:[/b] product backlogs order priority; teams drag items into sprints representing time boxes. Board columns map to state transitions—WIP limits and definitions of done remain social agreements, not automatic Git rules. Closing a sprint does not merge branches; engineering still completes PRs.
 
-[b]Queries:[/b] WIQL (Work Item Query Language) powers saved queries and dashboards—treat complex queries like code: review and test them.
+[b]Linking Git activity:[/b] mention [code]#12345[/code] in commits or PR descriptions to associate work. Branch policies can require linked items before merge—mirroring traceability gates in regulated industries. Smart use beats blanket enforcement: exempt docs-only branches if policy allows.
+
+[b]Queries and dashboards:[/b] WIQL powers saved queries (“all active bugs in area X assigned to me”). Treat complex queries like code: review in pull requests when they drive release readiness dashboards. Notifications and @mentions route chatter off email into actionable items.
+
+[b]Traceability vs velocity:[/b] full linkage helps audits and release notes automation; it adds friction if developers juggle IDs for typo fixes. Templates, IDE integrations, and consistent branch naming ([code]user/PROJ-456-desc[/code]) reduce cognitive load.
+
+[b]Reporting for releases:[/b] queries like “all User Stories closed in Sprint 42 with merged PRs” power release notes and compliance packets. Automate generation where possible, but spot-check—mis-linked work items make burndown charts lie while Git history remains honest. Area paths slice ownership; mis-assigned areas hide queues from the teams that actually merge fixes.
+
+[b]When things go wrong:[/b] builds show “succeeded” but work items stay New because nobody linked them—training issue, not CI failure. Duplicate items proliferate when everyone files bugs instead of searching first—groom backlogs weekly. WIQL dashboards returning empty after template migration usually mean renamed states or fields; open query editor and fix literals. Sprint closure without merged PRs leaves “Done” items shipping nothing—reconcile board columns with Git reality before demos.
 
 [b]Takeaway:[/b] Boards describe intent; Git describes reality—use links and policies to keep them honest without drowning engineers in paperwork.

@@ -19,16 +19,31 @@ mode = platform_theory
 
 [center][color=#00aa90][b]self-host first[/b][/color]  ·  Raspberry Pi to data center[/center]
 
+[code]
+   git clone https://forge.example/gitea/myapp.git
+   # same Git objects — PR metadata lives in forge DB
+[/code]
+
 [description]
 
-[b]Gitea[/b] is a lightweight forge: Git hosting, issues, wiki, organizations, OAuth, and optional CI (“Actions”-compatible workflows) in a single Go binary that is easy to deploy behind nginx. [b]Forgejo[/b] forked from Gitea under community governance; both share similar UX and goals—pick based on governance, release cadence, and plugin ecosystem you trust.
+[b]Gitea[/b] packages Git hosting, issues, wiki, organizations, OAuth, releases, and optional Actions-compatible CI into a single Go binary deployable behind nginx or Caddy on minimal hardware. [b]Forgejo[/b] forked under community governance with similar goals—choose based on release cadence, governance trust, and plugin compatibility your operators prefer.
 
-[b]Why choose this family:[/b] minimal RAM footprint, fast setup for small teams, air-gapped labs, or personal servers. You trade fewer enterprise bells and whistles (advanced compliance modules, huge marketplace) for simplicity and cost.
+[b]Why self-host this family:[/b] low RAM footprint, fast lab setup, air-gapped environments, homelab, and NGOs avoiding SaaS lock-in. You trade enterprise compliance modules and huge marketplaces for operational simplicity—backups and upgrades become your responsibility day one.
 
-[b]Git is unchanged:[/b] SSH and HTTP remotes behave like any other host; [code]git push[/code] updates refs server-side; PR/MR objects live in the forge database, not inside commit payloads.
+[b]Git unchanged:[/b] SSH and HTTPS remotes behave like Oh My Git remotes; [code]git push[/code] updates refs server-side; objects live in bare repositories on disk. Pull requests, issues, and stars live in the forge database—not inside commit payloads—so mirror Git alone does not backup tickets.
 
-[b]Organizations and teams:[/b] mirror GitHub/GitLab patterns at smaller scale—repos belong to users or orgs; team units grant access. Audit logging depth varies by version and configuration.
+[b]Organizations and teams:[/b] repos nest under users or orgs with team-based ACLs mirroring larger forges at smaller scale. Public instance admins must harden registration spam, rate limits, and outbound mail.relay settings.
 
-[b]Actions compatibility:[/b] when enabled, YAML workflows resemble GitHub Actions enough for many portable jobs, but always verify syntax and runner labels against your installed version’s docs.
+[b]Actions compatibility:[/b] when enabled, YAML workflows resemble GitHub Actions enough for portable jobs, but runner labels, expression syntax, and cache semantics differ by version—test on your installed release before porting pipelines wholesale.
 
-[b]Takeaway:[/b] treat Gitea/Forgejo as “Git plus a thin collaboration shell”—ideal when you want ownership of the whole stack without running a heavyweight platform.
+[b]Forgejo vs Gitea operations:[/b] migration paths exist but are not magic—export database, config, and repo paths during major governance switches. Document which binary your production runs to avoid mixed advice from outdated blog posts.
+
+[b]Federation experiments:[/b] some directions explore ActivityPub-style cross-instance following—treat as evolving unless your release notes commit to stable semantics.
+
+[b]Migration between forks:[/b] moving from Gitea to Forgejo (or reverse) requires planned export of database, config, and repository paths—URLs change, webhooks must be re-registered, CI runners re-enrolled. Communicate remote URL updates so developers fix [code]git remote set-url[/code] in one coordinated window.
+
+[b]Community governance signals:[/b] Forgejo’s community governance may prioritize EU hosting narratives and plugin policies differently from Gitea’s CNCF sandbox path—evaluate long-term maintainer energy, security advisory channels, and extension compatibility for your org before betting a decade of source history.
+
+[b]When things go wrong:[/b] “works on GitHub Actions, fails on Gitea” usually means unsupported action or wrong runner label—read job logs for “waiting for runner.” Out-of-disk on tiny VPS breaks pushes silently after LFS growth—monitor volume hosting [code]/data[/code]. Public registration spam forks flood admins—disable open signup or add captcha early. Wrong workflow directory ([code].github[/code] vs [code].gitea[/code]) leaves Actions silently inactive after upgrade.
+
+[b]Takeaway:[/b] treat Gitea/Forgejo as Git plus a thin collaboration shell—ideal when you want ownership of the whole stack without running a heavyweight platform.
