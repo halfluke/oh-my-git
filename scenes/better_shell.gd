@@ -67,7 +67,7 @@ func run_async_thread(shell_command):
 	shell_command.emit_signal("done")
 	
 func _shell_binary():
-	if _os == "Linux" or _os == "X11" or _os == "OSX":
+	if _os == "Linux" or _os == "X11" or _os == "OSX" or _os == "macOS":
 		return "bash"
 	elif _os == "Windows":
 		return "dependencies\\windows\\git\\bin\\bash.exe"

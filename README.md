@@ -16,9 +16,9 @@ If you have ideas for new features, we'd be excited to hear them! Also in that c
 
 Wanna build your own level? Great! Here's how to do it:
 
-1. Download the latest version of the [Godot **3** game engine](https://godotengine.org/download/3.x). Godot 4 is not supported yet.
+1. Download [Godot **4.3**](https://godotengine.org/download/archive/4.3-stable/) (or a compatible 4.x release).
 1. Clone this repository.
-1. Run the game – the easiest way to do so is to run `godot scenes/main.tscn` from the project directory.
+1. Run the game – the easiest way to do so is to run `godot4 scenes/main.tscn` from the project directory (or `godot` if that is your Godot 4 binary name).
 1. Get a bit familiar with the levels which are currently there.
 1. Take a look into the `levels` directory. It's split into chapters, and each level is a file.
 1. Make a copy of an existing level or start writing your own. See the documention of the format below.
@@ -77,11 +77,11 @@ At this stage, we're still exploring ourselves which kind of levels would be fun
 
 ## Contribute code!
 
-To open the game in the [Godot editor](https://godotengine.org), run `godot project.godot`. You can then run the game using *F5*.
+To open the game in the [Godot editor](https://godotengine.org), run `godot4 project.godot`. You can then run the game using *F5*.
 
 Feel free to make improvements to the code and send pull requests! There is one exception: because merge conflicts in Godot's scene files tends to be hard to resolve, before working on an existing *\*.tscn* file, please get in touch with us.
 
-To build your own binaries, you'll need Godot's [export templates](https://docs.godotengine.org/en/stable/getting_started/workflow/export/exporting_projects.html), and `zip`, `wget`, and `7z`. Then, run `make`. On Debian/Ubuntu, the Godot binary is called `godot3`, you might need to adjust the paths in the Makefile.
+To build your own binaries, install Godot 4's [export templates](https://docs.godotengine.org/en/stable/getting_started/workflow/export/exporting_projects.html) for your Godot version (e.g. `4.3.stable`), plus `zip`, `wget`, and `7z`. Then run `make`. The Makefile uses `godot4` by default; override with `make GODOT=/path/to/godot` if needed.
 
 ## Code of Conduct
 

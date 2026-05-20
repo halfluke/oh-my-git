@@ -15,7 +15,6 @@ func quit():
 func open_level_select():
 	get_tree().change_scene_to_file("res://scenes/level_select.tscn")
 
-
 func on_survey_pressed():
 	game.open_survey()
 

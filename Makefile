@@ -1,28 +1,35 @@
 name = "oh-my-git"
+GODOT ?= godot4
 
 all: linux macos windows
 
-.PHONY: web
+.PHONY: test test-export web
+
+test:
+	./scripts/test.sh
+
+test-export:
+	RUN_EXPORT_TEST=1 ./scripts/test.sh
 
 linux:
 	mkdir -p build/$(name)-linux
-	godot --export-debug "Linux" "build/$(name)-linux/$(name)"
+	$(GODOT) --headless --export-debug "Linux" "build/$(name)-linux/$(name)"
 	cd build/$(name)-linux && zip -r ../$(name)-linux.zip *
 
 macos:
 	mkdir -p build
-	godot --export-debug "Mac OS" "build/$(name)-macos.zip"
+	$(GODOT) --headless --export-debug "Mac OS" "build/$(name)-macos.zip"
 
 windows: dependencies/windows/git/
 	mkdir -p build/$(name)-windows
 	# We're using the debug template here so that the bash.exe doesn't spawn a cmd.exe each time...
-	godot --export-debug "Windows" "build/$(name)-windows/$(name).exe"
+	$(GODOT) --headless --export-debug "Windows" "build/$(name)-windows/$(name).exe"
 	cp -r --parents dependencies/windows/git/ build/$(name)-windows/
 	cd build/$(name)-windows && zip -r ../$(name)-windows.zip *
 
 web:
 	mkdir -p build/$(name)-web
-	godot --export-debug "Web" "build/$(name)-web/index.html"
+	$(GODOT) --headless --export-debug "Web" "build/$(name)-web/index.html"
 	cp -r web/web-shell/ build/$(name)-web/
 
 clean-unzipped:

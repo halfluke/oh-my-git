@@ -1,0 +1,26 @@
+name: Test
+
+on:
+  push:
+    branches: ['**']
+    tags-ignore: ['*']
+  pull_request:
+
+env:
+  GODOT_VERSION: 4.3
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    container:
+      image: barichello/godot-ci:4.3
+    steps:
+      - uses: actions/checkout@v4
+      - name: Install dependencies
+        run: apt-get update && apt-get install -y git make
+      - name: Setup export templates
+        run: |
+          mkdir -p ~/.local/share/godot/export_templates
+          mv /root/.local/share/godot/export_templates/$GODOT_VERSION.stable ~/.local/share/godot/export_templates/$GODOT_VERSION.stable
+      - name: Run automated tests
+        run: ./scripts/test.sh

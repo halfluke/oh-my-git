@@ -64,15 +64,19 @@ func _collect_file_statuses(files: Array, wd_files: Array) -> Dictionary:
 	for line in index_raw.split("\n"):
 		if line == "":
 			continue
-		var parts = line.split(" ", false, 3)
-		if parts.size() < 4:
+		var tab = line.find("\t")
+		if tab == -1:
 			continue
-		var path = parts[3]
+		var path = line.substr(tab + 1)
 		if not statuses.has(path):
 			continue
 		statuses[path]["exists_in_index"] = true
+		var meta = line.substr(0, tab).split(" ")
+		if meta.size() < 2:
+			continue
+		var blob_hash = meta[1]
 		if statuses[path]["index_hash"] == "":
-			statuses[path]["index_hash"] = parts[1]
+			statuses[path]["index_hash"] = blob_hash
 		else:
 			statuses[path]["conflict"] = true
 
@@ -140,72 +144,28 @@ func update():
 			item.connect("clicked", Callable(self, "item_clicked"))
 			grid.add_child(item)
 		
-		if files.size() > 0:
+		if files.size() > 0 and mode == FileBrowserMode.WORKING_DIRECTORY:
 			game.notify("Click on these files to edit them!", self, "file-browser")
 						
-		if false:
-			match mode:
-				FileBrowserMode.WORKING_DIRECTORY:
-					if shell:
-						
-						var deleted_files = []
-						if (await shell.run("test -d super.git && echo yes || echo no")) == "yes\n":
-							deleted_files = Array((await shell.run("git status -s | grep '^.D' | sed 's/^...//'")).split("\n"))
-							deleted_files.pop_back()
-						
-						#var is_visible = false
-						for file_path in files:
-							if file_path.substr(0, 5) == ".git/":
-								continue
-							#is_visible = true
-							var item = preload("res://scenes/file_browser_item.tscn").instantiate()
-							item.label = file_path
-							item.connect("clicked", Callable(self, "item_clicked"))
-							item.connect("deleted", Callable(self, "item_deleted"))
-							#ToDo what'shappening with the status?
-							#item.status = get_file_status(file_path, shell, 1)
-								
-							grid.add_child(item)
-						#visible = is_visible				
-						
-				FileBrowserMode.COMMIT:
-					if commit:
-						# The last entry is an empty string, remove it.
-						files.pop_back()
-						for file_path in files:
-							var item = preload("res://scenes/file_browser_item.tscn").instantiate()
-							item.label = file_path
-							item.connect("clicked", Callable(self, "item_clicked"))
-							grid.add_child(item)
-				FileBrowserMode.INDEX:
-					#var is_visible = false					
-					if repository and repository.there_is_a_git_cache:
-						
-						var deleted_files = Array((await repository.shell.run("git status -s | grep '^D' | sed 's/^...//'")).split("\n"))
-						# The last entries are empty strings, remove them.
-						
-						for file_path in files:
-							var item = preload("res://scenes/file_browser_item.tscn").instantiate()
-							item.label = file_path
-							item.connect("clicked", Callable(self, "item_clicked"))
-							#item.status = get_file_status(file_path, repository.shell, 0)
-							grid.add_child(item)
-							#if item.status != item.IconStatus.NONE:
-							#	is_visible = true		
-					#visible = is_visible				
-						
+func file_click_allowed(item) -> bool:
+	match mode:
+		FileBrowserMode.WORKING_DIRECTORY:
+			return item.file_status.get("exists_in_wd", false)
+		FileBrowserMode.COMMIT:
+			return true
+		FileBrowserMode.INDEX:
+			return not item.file_status.get("conflict", false)
+	return false
+
 func item_clicked(item):
-	if not item.get_node("VBoxContainer/Control/WD").visible:
+	if not file_click_allowed(item):
 		return
-		
 	match mode:
 		FileBrowserMode.WORKING_DIRECTORY:
 			text_edit.text = helpers.read_file(repository.shell._cwd + item.label)
 		FileBrowserMode.COMMIT:
 			text_edit.text = await commit.repository.shell.run("git show %s:\"%s\"" % [commit.id, item.label])
 		FileBrowserMode.INDEX:
-			if item.status == item.IconStatus.CONFLICT:
-				return
 			text_edit.text = await repository.shell.run("git show :\"%s\"" % [item.label])
 			
 	open_file = item.label

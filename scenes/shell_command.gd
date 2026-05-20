@@ -9,6 +9,8 @@ var exit_code
 var crash_on_fail = true
 var thread
 var js_callback # For JavaScriptBridge
+var tmp_prefix := ""
+var cwd := ""
 
 func _emit_done():
 	emit_signal("done")
