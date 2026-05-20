@@ -17,6 +17,10 @@ config/custom_user_dir_name="Oh My Git"
 config/features=PackedStringArray("4.3")
 boot_splash/bg_color=Color(0, 0, 0, 1)
 
+[audio]
+
+buses/default_bus_layout="res://default_bus_layout.tres"
+
 [autoload]
 
 game="*res://scenes/game.tscn"
