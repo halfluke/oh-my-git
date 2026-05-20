@@ -97,8 +97,6 @@ func send_command(command):
 	repository.shell.cd(repository.path)
 	var shell_cmd = repository.shell.run_async(command, false)
 	await shell_cmd.done
-	if shell_cmd.thread:
-		shell_cmd.thread.wait_to_finish()
 
 	var cmd = ShellCommand.new()
 	cmd.command = command

@@ -23,6 +23,7 @@ func run(command, crash_on_fail=true):
 	shell_command.crash_on_fail = crash_on_fail
 
 	run_async_thread(shell_command)
+	shell_command._emit_done()
 	if _debug:
 		print("output of (" + command + "): >>" + shell_command.output + "<<")
 	exit_code = shell_command.exit_code
@@ -33,6 +34,8 @@ func run_async_web(command, crash_on_fail=true):
 	shell_command.command = command
 	shell_command.crash_on_fail = crash_on_fail
 	run_async_thread(shell_command)
+	if _os != "Web":
+		shell_command._emit_done()
 	return shell_command
 
 func run_async(command, crash_on_fail=true):
@@ -46,6 +49,13 @@ func run_async(command, crash_on_fail=true):
 
 func _run_in_thread(shell_command):
 	run_async_thread(shell_command)
+	call_deferred("_complete_async_command", shell_command)
+
+func _complete_async_command(shell_command):
+	if shell_command.thread:
+		shell_command.thread.wait_to_finish()
+		shell_command.thread = null
+	shell_command._emit_done()
 
 func run_async_thread(shell_command):
 	var command = shell_command.command
@@ -85,7 +95,6 @@ func run_async_thread(shell_command):
 	if _os != "Web":
 		shell_command.output = result["output"]
 		shell_command.exit_code = result["exit_code"]
-		shell_command._emit_done()
 
 func _shell_binary():
 	if _os == "Linux" or _os == "OSX":
