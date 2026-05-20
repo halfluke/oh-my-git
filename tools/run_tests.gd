@@ -1,5 +1,7 @@
 extends SceneTree
 
+const ShellScript = preload("res://scenes/shell.gd")
+
 class MockFileItem:
 	var file_status := {}
 
@@ -171,7 +173,7 @@ func _cleanup() -> void:
 
 func _test_shell() -> void:
 	print("-- shell --")
-	var shell := Shell.new()
+	var shell: Node = ShellScript.new()
 	_track_cleanup(shell)
 	var test_dir := "%stest-repos/shell-%d/" % [_game().tmp_prefix, randi()]
 	DirAccess.make_dir_recursive_absolute(test_dir)
@@ -180,7 +182,7 @@ func _test_shell() -> void:
 	var sync_out: String = await shell.run("echo sync-ok")
 	_assert(sync_out.strip_edges() == "sync-ok", "shell.run should execute commands")
 
-	var async_cmd: ShellCommand = shell.run_async("echo async-ok")
+	var async_cmd: Node = shell.run_async("echo async-ok")
 	_track_cleanup(async_cmd)
 	await async_cmd.done
 	_assert(async_cmd.output != null, "shell.run_async should produce output")
@@ -198,7 +200,7 @@ func _test_file_browser() -> void:
 	var repo_dir := "%stest-repos/file-browser-%d/" % [_game().tmp_prefix, randi()]
 	DirAccess.make_dir_recursive_absolute(repo_dir)
 
-	var shell := Shell.new()
+	var shell: Node = ShellScript.new()
 	_track_cleanup(shell)
 	shell.cd(repo_dir)
 	await shell.run("git init -b main")
