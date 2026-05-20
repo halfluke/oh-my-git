@@ -71,6 +71,27 @@ size_flags_stretch_ratio = 2.0
 mouse_filter = 2
 theme_override_constants/separation = 8
 
+[node name="PlatformTheoryPanel" type="VBoxContainer" parent="Rows/Columns/Repositories"]
+visible = false
+layout_mode = 2
+size_flags_horizontal = 3
+size_flags_vertical = 3
+mouse_filter = 2
+
+[node name="DiagramTopMargin" type="MarginContainer" parent="Rows/Columns/Repositories/PlatformTheoryPanel"]
+layout_mode = 2
+size_flags_horizontal = 3
+size_flags_vertical = 3
+theme_override_constants/margin_top = 96
+
+[node name="DiagramBody" type="RichTextLabel" parent="Rows/Columns/Repositories/PlatformTheoryPanel/DiagramTopMargin"]
+custom_minimum_size = Vector2(400, 400)
+layout_mode = 2
+size_flags_horizontal = 3
+size_flags_vertical = 3
+bbcode_enabled = true
+scroll_active = true
+
 [node name="RightSide" type="VBoxContainer" parent="Rows/Columns"]
 layout_mode = 2
 size_flags_horizontal = 3
@@ -203,6 +224,20 @@ theme_override_styles/normal = ExtResource("4")
 theme_override_styles/hover = SubResource("2")
 text = "Next level"
 
+[node name="SandboxPrevButton" type="Button" parent="Menu"]
+visible = false
+layout_mode = 2
+focus_mode = 0
+text = "◀ Previous"
+tooltip_text = "Previous: sandbox & reading trail"
+
+[node name="SandboxNextButton" type="Button" parent="Menu"]
+visible = false
+layout_mode = 2
+focus_mode = 0
+text = "Next ▶"
+tooltip_text = "Next: sandbox & reading trail"
+
 [connection signal="saved" from="Rows/Columns/RightSide/FileBrowser" to="." method="update_repos"]
 [connection signal="command_done_signal" from="Rows/Controls/Terminal" to="." method="update_repos"]
 [connection signal="pressed" from="Menu/BackButton" to="." method="back"]
@@ -210,3 +245,5 @@ text = "Next level"
 [connection signal="pressed" from="Menu/CardsButton" to="." method="toggle_cards"]
 [connection signal="pressed" from="Menu/Tip!" to="." method="new_tip"]
 [connection signal="pressed" from="Menu/NextLevelButton" to="." method="load_next_level"]
+[connection signal="pressed" from="Menu/SandboxPrevButton" to="." method="sandbox_prev"]
+[connection signal="pressed" from="Menu/SandboxNextButton" to="." method="sandbox_next"]

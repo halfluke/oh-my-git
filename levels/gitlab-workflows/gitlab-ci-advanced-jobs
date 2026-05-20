@@ -1,0 +1,31 @@
+title = Rules, child pipelines, includes, and CI efficiency
+mode = platform_theory
+
+[diagram]
+
+[code]
+   .gitlab-ci.yml
+        │
+        ├── include: remote / local templates
+        ├── rules: if/ changes / exists
+        └── trigger: child pipeline
+                 │
+                 ▼
+        parent pipeline ←── status aggregation
+[/code]
+
+[center][color=#6b4fbb]needs:[/color]  DAG jobs  ·  [color=#fca326]parallel/matrix[/color][/center]
+
+[description]
+
+[b]rules:[/b] replace legacy [code]only/except[/code] with expressive conditions: branch patterns, MR vs push, file changes, or manual pipelines. Fewer surprise runs means cheaper runners and clearer dashboards.
+
+[b]include:[/b] centralize templates across hundreds of repos—watch versioning (pin to a tag or SHA) so a template edit cannot break every pipeline at once.
+
+[b]Child / multi-project pipelines:[/b] [code]trigger[/code] launches separate pipelines (same repo or downstream) for modular systems; aggregate results back to the parent for MR gates.
+
+[b]needs:[/b] builds a DAG inside a stage so tests start as soon as build artifacts exist—large speedups over strict stage waterfalls.
+
+[b]Caches and artifacts:[/b] scope caches per-branch or per-file to avoid poisoning; artifact expiry keeps disk predictable on self-managed instances.
+
+[b]Takeaway:[/b] advanced CI is still “run commands on Git objects”—invest in fast feedback on default branches and strict controls on fork pipelines.

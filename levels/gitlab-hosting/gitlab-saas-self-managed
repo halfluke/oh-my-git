@@ -1,0 +1,33 @@
+title = GitLab.com vs self-managed: what moves where
+mode = platform_theory
+
+[diagram]
+
+[center][color=#fca326]SaaS[/color]  vs  [color=#6b4fbb]self-managed[/color][/center]
+
+[code]
+   gitlab.com                    your VPC / airgap
+   ┌──────────────────┐         ┌──────────────────────────┐
+   │ shared runners   │         │ your runners + LDAP/SAML │
+   │ upgrades by GL   │         │ you patch + scale        │
+   │ storage quotas   │         │ object storage backends  │
+   └──────────────────┘         └──────────────────────────┘
+           │                                  │
+           └──────── same Git push URL ───────┘
+[/code]
+
+[center][b]Git remote URL[/b] still points at GitLab HTTP/SSH endpoint[/center]
+
+[description]
+
+[b]GitLab.com[/b] hosts your projects on GitLab’s infrastructure: runners may be shared or purchased, storage and CI minutes are metered on free tiers, and compliance features (audit events, geo replication) exist on higher tiers. You trade control for speed of onboarding.
+
+[b]Self-managed:[/b] you operate the Rails monolith (or smaller “Omnibus”/Helm deployments), attach your identity provider, wire object storage for artifacts and LFS, and attach runners wherever they fit compliance (on-prem VMs, Kubernetes). Upgrades and backups become your operational work.
+
+[b]Hybrid patterns:[/b] some enterprises use GitLab.com for OSS-style collaboration while keeping proprietary code self-managed, or mirror between the two. Git itself is still the interchange format.
+
+[b]Licensing snapshot:[/b] tiers unlock features (compliance dashboards, security policies, merge trains). The Git layer does not care about license—only humans and license servers do.
+
+[b]Disaster recovery mindset:[/b] treat GitLab as a database plus file storage: protect PostgreSQL, Redis, Gitaly storage for repos, and CI artifact buckets. Practice restore drills; Git remotes elsewhere are not a full backup of issues and pipeline history.
+
+[b]Takeaway:[/b] pick SaaS when you want the vendor to run the platform; pick self-managed when policy demands data and runners stay inside your fence. Git commands stay the same either way.

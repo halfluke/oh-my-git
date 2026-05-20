@@ -1,0 +1,50 @@
+title = Issues, labels, and project boards
+mode = platform_theory
+
+[diagram]
+
+[center][color=#8b949e]tracker (not stored as Git blobs)[/color][/center]
+
+[code]
+   ISSUE #123  ┌─────────────────────────────────────┐
+               │ title · body · assignees · labels   │
+               │ checklist · linked PR #88 · #90     │
+               │ timeline: comments, state changes   │
+               └─────────────────────────────────────┘
+                      │ auto-close keywords
+                      ▼ (on merge to default branch)
+               CLOSED + link to landing commit
+[/code]
+
+[center][color=#79b8ff]Labels[/color]  bug · priority · area:auth  — filter & automation hooks[/center]
+
+[code]
+   PROJECT BOARD
+   ┌──────────┬──────────┬──────────┐
+   │ Backlog  │ Doing    │ Done     │
+   │ #101 #99 │ #120     │ #88 #90  │
+   └──────────┴──────────┴──────────┘
+        drag cards = issues or PRs
+[/code]
+
+[description]
+
+[b]Issues[/b] are durable discussion threads with metadata: title, description, assignees, labels, milestones, and cross-references. They get stable numbers ([code]#42[/code]) that humans memorize. Unlike commits, issues are not part of the Git object database; they live in GitHub’s application database and are accessed via web or API.
+
+[b]Linking work to code:[/b] the common pattern is to mention an issue in a commit message or PR description with a [i]closing keyword[/i] such as [code]Fixes #42[/code] or [code]Closes org/repo#42[/code] for cross-repo links. When the default branch receives the merge commit that contains that text, GitHub may auto-close the issue and draw a hyperlink to the merge result. Exact keyword lists and default-branch rules are host configuration—always read your org’s docs.
+
+[b]Labels:[/b] free-form tags for triage: severity, component, “good first issue,” or release train. Automation (GitHub Actions, bots) can add or remove labels based on paths touched, PR size, or idle time. Labels do not change Git history; they change how humans and scripts slice the backlog.
+
+[b]Milestones & releases:[/b] milestones group issues/PRs toward a date or version. [b]Releases[/b] attach human-readable notes and often binary assets to a tag Git already points at. The tag is Git; the release notes and .zip uploads are GitHub.
+
+[b]Project boards:[/b] classic projects or newer “Projects” provide kanban or spreadsheet views over issues and PRs. Cards can move columns when automation rules fire (for example when a linked PR merges). That movement is host state; your repo’s [code]main[/code] branch does not know a card moved.
+
+[b]Why keep issue numbers in commits?[/b] Archaeologists reading [code]git log[/code] years later see which customer-facing defect a change addressed without opening a browser—provided the message is honest and the issue was not deleted against policy.
+
+[b]Permissions:[/b] “triage” role can manage issues without merge rights; external contributors may comment on public issues while secrets stay in private repos. Do not paste production credentials into issues—they are often mirrored, emailed as notifications, and indexed.
+
+[b]Discussions vs issues:[/b] some repos use GitHub Discussions for Q&A and keep issues for actionable engineering work. Crossing the streams confuses search; pick a team convention.
+
+[b]Templates:[/b] issue and PR templates nudge reporters toward repro steps, version numbers, and risk flags. They are markdown in [code].github/[/code]; still Git-tracked files.
+
+[b]Takeaway:[/b] issues and boards are [i]coordination state[/i]; Git is [i]source state[/i]. Strong teams keep links between them tight so neither world goes stale.

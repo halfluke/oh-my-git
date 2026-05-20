@@ -1,0 +1,57 @@
+title = Hosting, `origin`, and GitHub URLs
+mode = platform_theory
+
+[diagram]
+
+[center][color=#79b8ff][b]LOCAL[/b][/color]  [code]~/work/sweet[/code][/center]
+
+[code]
+   refs/heads/main ──●──●──●──●  (your commits)
+                         │
+           ┌─────────────┴─────────────┐
+           │   remote-tracking ref     │
+           │   refs/remotes/origin/main│
+           └─────────────┬─────────────┘
+                         │  tracks
+                         ▼
+[/code]
+
+[center][color=#f0883e][b]REMOTE  origin[/b][/color]  (nickname → URL)[/center]
+
+[code]
+   origin.URL = https://github.com/you/sweet.git
+              or git@github.com:you/sweet.git
+
+   GITHUB bare repo:  main ──●──●──●──●──●  (shared)
+[/code]
+
+[center][color=#ffa657]HTTPS[/color]  ·  PAT or credential helper  ·  firewall-friendly[/center]
+[center][color=#7ee787]SSH[/color]    ·  key pair [code]~/.ssh/id_ed25519[/code]  ·  agent forwarding cautiously[/center]
+
+[center][color=#8b949e]fork adds a second remote you name [code]upstream[/code][/color][/center]
+
+[description]
+
+When you [code]git clone https://github.com/you/sweet.git[/code], Git copies objects into [code].git/objects[/code], checks out a default branch into your working tree, and writes [code].git/config[/code] with a remote stanza. By convention the first remote is named [code]origin[/code], but it is only a string; you could call it [code]company[/code] or [code]backup[/code].
+
+[b]What [code]origin[/code] really stores:[/b] a URL (or multiple URLs for push/pull split), plus the result of the last [code]fetch[/code]: remote-tracking branches under [code]refs/remotes/origin/[/code]. Those are read-only pointers Git updates for you—they show where [code]origin[/code]’s branches were when you last talked to the server.
+
+[b]Push and pull in plain terms:[/b] [code]git push origin feature[/code] sends objects the server lacks, then asks the server to move [code]refs/heads/feature[/code] forward. [code]git pull[/code] is usually [code]fetch[/code] plus a merge or rebase into your current branch; the fetch step downloads new objects and moves your remote-tracking refs.
+
+[b]HTTPS vs SSH on GitHub:[/b] HTTPS uses TLS to [code]github.com[/code]; authentication is often a [b]personal access token[/b] (PAT) instead of a password, because GitHub disabled account passwords for Git operations. SSH uses your public key registered in GitHub settings; the URL form is [code]git@github.com:user/repo.git[/code]. Pick SSH when you want agent-based keys across many repos; pick HTTPS when outbound SSH is blocked.
+
+[b]Fork workflow remotes:[/b] after you fork on GitHub, your clone’s [code]origin[/code] points at [i]your[/i] fork. Add another remote, commonly [code]upstream[/code], for the canonical repository: [code]git remote add upstream https://github.com/org/repo.git[/code]. You fetch from both, branch locally, push branches to [code]origin[/code], and open PRs from fork → upstream. All of that is still vanilla Git remotes; the fork button only created a new bare repo server-side.
+
+[b]Where Git ends and GitHub begins:[/b] Git never sees “branch protection.” If a push is rejected with a polite server message, Git reports failure; the policy (required reviews, signed commits, linear history) lives on the host. Similarly, [code]deploy keys[/code] are GitHub’s way to scope read-only or read-write access to a single repo.
+
+[b]Multiple remotes:[/b] open-source maintainers often have [code]origin[/code] (their fork), [code]upstream[/code], and maybe [code]friend[/code] for a colleague’s experimental remote. [code]git remote -v[/code] is your map; rename or prune remotes when projects move.
+
+[b]Large repos and partial clone:[/b] hosts may advertise filter options; that is still Git wire protocol with server support. Nothing about that is GitHub-exclusive, though GitHub’s docs are where many developers first read about it.
+
+[b]Shallow history and tags:[/b] [code]git clone --depth 1[/code] trades disk for incomplete ancestry; CI often does this. Tags are refs too—[code]git push origin v1.2[/code] publishes a release pointer unless the host blocks tag pushes via rules.
+
+[b]Credential helpers and SSO:[/b] enterprises sometimes route HTTPS Git through SAML helpers that mint short-lived tokens. When auth suddenly breaks, the failure is usually identity plumbing, not Git’s merge algorithm.
+
+[b]Submodules and LFS:[/b] submodules point your superproject at specific commits of other repos; each submodule still has its own remotes. Git LFS stores large blobs outside normal packfiles; hosts charge or throttle LFS bandwidth separately from Git pushes.
+
+[b]Takeaway:[/b] treat URLs and remote names as a dial plan. [code]origin[/code] is the default speed-dial entry, not a magic branch. Git moves objects and refs; GitHub decides whether you were allowed to.

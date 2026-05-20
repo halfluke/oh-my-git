@@ -1,0 +1,29 @@
+title = Organizations, projects, and Azure Repos (Git)
+mode = platform_theory
+
+[diagram]
+
+[code]
+   Azure DevOps organization
+              │
+      ┌───────┼───────┐
+      ▼       ▼       ▼
+   Project A  Project B  (each has Boards, Repos, Pipelines…)
+      │
+      └── Repos  →  Git remote (HTTPS / SSH)
+             └── policies + permissions scoped per repo
+[/code]
+
+[center][color=#0078d4][b]Azure Repos[/b][/color]  is Git hosting inside a project[/center]
+
+[description]
+
+[b]Organization[/b] is the billing and identity boundary in Azure DevOps: users, groups, and policies can be managed at org scope. [b]Projects[/b] partition work: each project typically hosts Git repositories under [b]Azure Repos[/b], work tracking on [b]Boards[/b], builds/releases under [b]Pipelines[/b], and optional [b]Artifacts[/b] feeds.
+
+[b]Remote URLs:[/b] cloning shows hostnames under [code]dev.azure.com[/code] or on-premises Azure DevOps Server collection URLs. Git behavior is unchanged; PATs or SSH keys authenticate like other hosts.
+
+[b]Repo limits and naming:[/b] large monorepos are supported but watch LFS, sparse checkout, and CI checkout depth to keep agents fast. Repo renames require updating remotes on all clones.
+
+[b]Cross-project dependencies:[/b] multi-repo pipelines and artifact feeds exist—design permissions so a pipeline in project A cannot exfiltrate secrets from project B unintentionally.
+
+[b]Takeaway:[/b] memorize the hierarchy org → project → repo before debugging “where did my permission go?”—inheritance is powerful and easy to misread.

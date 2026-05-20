@@ -85,7 +85,7 @@ func copy_script_to_game_env(name):
 	await global_shell.run("chmod u+x '%s'" % (tmp_prefix + name))
 	
 func _initial_state():
-	return {"history": [], "solved_levels": [], "received_hints": [], "cli_badge": [], "played_cards": []}
+	return {"history": [], "solved_levels": [], "received_hints": [], "cli_badge": [], "played_cards": [], "freeroam_read": []}
 	
 func save_state():
 	var savegame = FileAccess.open(_file,FileAccess.WRITE)
@@ -111,10 +111,15 @@ func load_state():
 	if new_state is Dictionary:
 		for key in new_state:
 			state[key] = new_state[key]
+	if not state.has("freeroam_read"):
+		state["freeroam_read"] = []
+	
+func reset_progress():
+	state = _initial_state()
+	save_state()
 	
 # filename is relative to the tmp directory!
 func create_file_in_game_env(filename, content):
-	print("CD-ing to tmp in create_file")
 	await global_shell.cd(tmp_prefix)
 	# Quoted HERE doc doesn't do any substitutions inside.
 	await global_shell.run("cat > '%s' <<'HEREHEREHERE'\n%s\nHEREHEREHERE" % [filename, content])

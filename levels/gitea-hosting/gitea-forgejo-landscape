@@ -1,0 +1,34 @@
+title = Gitea, Forgejo, and the lightweight forge family
+mode = platform_theory
+
+[diagram]
+
+[code]
+   upstream lineage
+        │
+   ┌────┴────┐
+   ▼         ▼
+ Gitea    Forgejo
+ (CNCF    (community
+  sandbox)  fork, EU focus)
+   │         │
+   └────┬────┘
+        ▼
+   small binary + web UI + Git + issues + Actions (optional)
+[/code]
+
+[center][color=#00aa90][b]self-host first[/b][/color]  ·  Raspberry Pi to data center[/center]
+
+[description]
+
+[b]Gitea[/b] is a lightweight forge: Git hosting, issues, wiki, organizations, OAuth, and optional CI (“Actions”-compatible workflows) in a single Go binary that is easy to deploy behind nginx. [b]Forgejo[/b] forked from Gitea under community governance; both share similar UX and goals—pick based on governance, release cadence, and plugin ecosystem you trust.
+
+[b]Why choose this family:[/b] minimal RAM footprint, fast setup for small teams, air-gapped labs, or personal servers. You trade fewer enterprise bells and whistles (advanced compliance modules, huge marketplace) for simplicity and cost.
+
+[b]Git is unchanged:[/b] SSH and HTTP remotes behave like any other host; [code]git push[/code] updates refs server-side; PR/MR objects live in the forge database, not inside commit payloads.
+
+[b]Organizations and teams:[/b] mirror GitHub/GitLab patterns at smaller scale—repos belong to users or orgs; team units grant access. Audit logging depth varies by version and configuration.
+
+[b]Actions compatibility:[/b] when enabled, YAML workflows resemble GitHub Actions enough for many portable jobs, but always verify syntax and runner labels against your installed version’s docs.
+
+[b]Takeaway:[/b] treat Gitea/Forgejo as “Git plus a thin collaboration shell”—ideal when you want ownership of the whole stack without running a heavyweight platform.

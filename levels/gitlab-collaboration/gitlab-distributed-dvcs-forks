@@ -1,0 +1,28 @@
+title = Forks, merge request from fork, and DVCS workflow
+mode = platform_theory
+
+[diagram]
+
+[code]
+   upstream project (canonical)
+              │
+         fork │  (GitLab UI: duplicate namespace)
+              ▼
+   contributor fork ──► branch push ──► MR → upstream default branch
+              │
+              └──── optional: shared runners on forks (policy)
+[/code]
+
+[center][color=#fca326]“Allow commits from upstream members”[/color]  ·  maintainer pushes to fork branch[/center]
+
+[description]
+
+[b]Forking on GitLab[/b] creates a full copy of the repository under another namespace so contributors can [code]git push[/code] without write access to the canonical project. The merge request then targets the upstream branch; permissions, pipelines, and secrets must be configured so untrusted forks cannot exfiltrate CI variables.
+
+[b]Merge request from fork:[/b] reviewers see the same diff-centric UI; the fork’s pipeline may run with reduced secrets. Many projects require a green pipeline on the fork branch before merge.
+
+[b]Shared runners on forks:[/b] instance administrators can disable or restrict shared runners for external forks to prevent crypto-mining abuse—expect slower feedback loops for drive-by contributors.
+
+[b]Internal forking:[/b] some enterprises fork inside the same top-level group for compliance boundaries; Git mechanics match public OSS, only ACLs differ.
+
+[b]Takeaway:[/b] treat fork MRs as partially trusted code execution: review diffs, cap CI secrets, and audit runner usage the same way you would for any external patch series.

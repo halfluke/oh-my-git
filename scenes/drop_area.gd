@@ -2,22 +2,36 @@ extends Node2D
 
 var hovered = false
 var highlighted = false: set = _set_highlighted
+var _hover_tween: Tween
 
 func _ready():
 	_set_highlighted(false)
-	
+
+func _exit_tree():
+	_kill_hover_tween()
+
+func _kill_hover_tween() -> void:
+	if _hover_tween and _hover_tween.is_valid():
+		_hover_tween.kill()
+		_hover_tween = null
+
 func _mouse_entered(_area):
 	hovered = true
-	var tween = get_tree().create_tween()
-	tween.tween_property($Highlight/Sprite2D.material, "shader_parameter/hovered", 1, 0.1)
-	#tween.interpolate_property($Highlight/Sprite2D.material, "shader_param/hovered", 0, 1, 0.1, Tween.TRANS_CUBIC, Tween.EASE_IN_OUT)
-	#add_child(tween)
-	#tween.start()
+	var material = $Highlight/Sprite2D.material
+	if material == null:
+		return
+	_kill_hover_tween()
+	_hover_tween = create_tween()
+	_hover_tween.tween_property(material, "shader_parameter/hovered", 1, 0.1)
 
 func _mouse_exited(_area):
 	hovered = false
-	var tween = get_tree().create_tween()
-	tween.tween_property($Highlight/Sprite2D.material, "shader_parameter/hovered", 0, 0.1)
+	var material = $Highlight/Sprite2D.material
+	if material == null:
+		return
+	_kill_hover_tween()
+	_hover_tween = create_tween()
+	_hover_tween.tween_property(material, "shader_parameter/hovered", 0, 0.1)
 
 	
 func _input(event):

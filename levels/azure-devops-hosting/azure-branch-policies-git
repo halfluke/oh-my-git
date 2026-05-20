@@ -1,0 +1,28 @@
+title = Branch policies, reviewers, and merge types in Azure Repos
+mode = platform_theory
+
+[diagram]
+
+[code]
+   branch: main (protected)
+        │
+        ├── require PR (no direct pushes)
+        ├── min reviewers + optional path owners
+        ├── build validation (pipeline must pass)
+        ├── linked work items (traceability)
+        └── merge types allowed (basic / squash / rebase+FF)
+[/code]
+
+[center][color=#0078d4]policy overrides[/color]  ·  inherit from project or set per branch[/center]
+
+[description]
+
+[b]Branch policies[/b] attach to a branch name pattern in Azure Repos: they can require pull requests, minimum reviewers, optional automatic reviewers for paths, successful builds from a specified YAML pipeline, and linked work items for traceability. Unlike informal team norms, policies are enforced server-side—attempts to bypass via force-push should fail when configured correctly.
+
+[b]Merge strategies:[/b] basic merge, squash, and rebase with fast-forward map to Git outcomes similar to other hosts; pick defaults that match your release archaeology needs.
+
+[b]Bypass permissions:[/b] emergency break-glass roles can bypass policies—treat as audited capability, not daily workflow.
+
+[b]Cross-service linkage:[/b] requiring work items ties Git activity to Boards items—great for compliance, painful if developers forget IDs; provide templates and CLI helpers.
+
+[b]Takeaway:[/b] treat policies as executable documentation: if the policy file does not match how the team really ships, either fix the process or simplify the policy to avoid shadow workflows.

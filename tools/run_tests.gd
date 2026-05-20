@@ -135,6 +135,8 @@ func _test_levels_parse() -> void:
 					var level_path := "res://levels/%s/%s" % [chapter, level_name]
 					var parsed: Dictionary = _helpers().parse(level_path)
 					_assert(parsed.has("description"), "level should have description: %s" % level_path)
+					var mode := str(parsed.get("mode", "git"))
+					var is_platform_theory := mode in ["platform_theory", "github_theory"]
 					var has_setup := false
 					var has_win := false
 					for key in parsed.keys():
@@ -143,8 +145,9 @@ func _test_levels_parse() -> void:
 							has_setup = true
 						if k.begins_with("win"):
 							has_win = true
-					_assert(has_setup, "level should have a setup section: %s" % level_path)
-					var optional_win := chapter in ["sandbox", "unused"] or level_name in [
+					if not is_platform_theory:
+						_assert(has_setup, "level should have a setup section: %s" % level_path)
+					var optional_win := is_platform_theory or chapter in ["sandbox", "unused"] or level_name in [
 						"pushed-something-broken",
 						"pr",
 						"gitignore",

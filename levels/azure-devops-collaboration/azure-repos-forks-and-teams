@@ -1,0 +1,26 @@
+title = Forks, repos, and team/project permissions
+mode = platform_theory
+
+[diagram]
+
+[code]
+   Project (Azure DevOps)
+        │
+        ├── Repos  (Git remotes)
+        │      ├── forks (contributor namespace)
+        │      └── permissions: readers / contributors / admins
+        │
+        └── Teams (group ACLs applied to repos & boards)
+[/code]
+
+[center][color=#0078d4]cross-project feeds[/color]  ·  artifact visibility[/center]
+
+[description]
+
+[b]Forks:[/b] contributors without Contribute on the canonical repo fork into their space, open a PR back—same social pattern as GitHub/GitLab. Clean up stale forks periodically.
+
+[b]Teams:[/b] map org structure to Azure DevOps groups; inherited permissions simplify admin but can over-grant—audit inherited vs explicit denies.
+
+[b]Repo vs project permissions:[/b] splitting microservices across repos within one project is common; cross-repo policies may need duplication unless templated.
+
+[b]Takeaway:[/b] treat Teams + repo ACLs as code: review diffs when access widens, especially on shared service connections used by pipelines.

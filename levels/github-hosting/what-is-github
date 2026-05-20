@@ -1,0 +1,51 @@
+title = What Git is vs what GitHub adds
+mode = platform_theory
+
+[diagram]
+
+[center][color=#8b949e]━━ Git · your machine ━━[/color][/center]
+
+[code]
+┌──────────────────────────────────────────┐
+│  working tree   files you edit & build   │
+│       ↑↓  checkout / commit / diff       │
+│  .git/          DAG: commits → parents   │
+│                 refs: branches, tags      │
+│  porcelain: commit merge rebase bisect…  │
+└──────────────────────────────────────────┘
+[/code]
+
+[center][color=#79b8ff]fetch / push[/color]  — packfiles + ref updates —  [color=#79b8ff]▼[/color][/center]
+
+[code]
+┌──────────────────────────────────────────┐
+│  BARE REPO on host (no working tree)     │
+│  same object model: blobs trees commits │
+│  + GitHub: issues PRs teams branch rules│
+│  + webhooks Actions audit log           │
+└──────────────────────────────────────────┘
+[/code]
+
+[center][color=#7ee787]peers · CI · bots[/color]  — [b]one graph of hashes[/b], many workflows around it[/center]
+
+[description]
+
+[b]Git[/b] answers: “How do I record history, branch, merge, and share commits?” It is a [i]content-addressed object database[/i] plus a few porcelain commands. Commits point to parent commits; branches and tags are refs (files under [code].git/refs[/code]); merges create either a merge commit or a fast-forward move of a pointer. None of that requires any company’s website.
+
+You can host that database anywhere: another folder, a USB drive, [code]file:///[/code] remotes, SSH to your own server, or a commercial host. The [b]repository[/b] is the data; the [b]remote[/b] is just another copy you synchronize with.
+
+[b]GitHub[/b] answers: “How do a hundred humans ship one product without stepping on each other?” It keeps authoritative bare repos, then adds accounts, organizations, fine-grained permissions, and a pile of [i]non-Git[/i] records: issue bodies, PR review threads, check runs, release assets, project views, and security advisories. Those records often [i]reference[/i] Git data (a PR points at two refs; a deployment might point at a tag) but they are not stored as Git blobs.
+
+[b]Concrete split:[/b] [code]git log --oneline --graph[/code] shows reality on the object graph. “Requested changes” on a PR is host UI state. “This commit closes #404” creates a [i]link[/i] when the merge lands; the issue is still not inside the commit object.
+
+[b]Why tutorials blur Git and GitHub:[/b] the happy path is “init locally → create empty repo on GitHub → add remote → push.” Students remember the brand, not the protocol. When something breaks, un-blurring matters: “permission denied” on push is usually host ACLs or SSH keys; “detached HEAD” after a bad fetch is pure Git.
+
+[b]Competing platforms:[/b] GitLab emphasizes CI and enterprise LDAP mapping; Gitea is lightweight self-hosting; Bitbucket still exists in corporate niches. Skills in remotes, rebasing, and reading history transfer everywhere. Skills in “GitHub Projects v2 automation” do not — treat those as vendor surface area.
+
+[b]Security mindset:[/b] anything that runs on push ([code]pre-receive[/code] hooks on the server, GitHub Actions, required status checks) is part of your supply chain. Git’s crypto is about integrity of object hashes; it does not audit who clicked “Merge”.
+
+[b]Signed commits vs GitHub “Verified”:[/b] Git can attach OpenPGP or SSH signatures to commits; GitHub surfaces a green badge when it trusts the key mapping to a user account. That is still Git data plus host trust policy.
+
+[b]Day-to-day workflow tip:[/b] do hard history surgery locally ([code]rebase -i[/code], [code]bisect[/code]) where tools are fast and mistakes are private; use the host for what needs witnesses: approvals, green CI, linked issues, and immutable audit trails.
+
+[b]Takeaway:[/b] Git is the [i]time machine for source code[/i]. GitHub is the [i]train station[/i]—timetables, tickets, and staff radios layered on top of the same tracks. Learn the machine first; then learn how your station is run.

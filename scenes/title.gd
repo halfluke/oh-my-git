@@ -1,17 +1,8 @@
 extends Control
 
-func _ready():
-	if !OS.has_feature("standalone") and !game.skipped_title:
-		game.skipped_title = true
-		call_deferred("_open_level_select")
-
-func _open_level_select():
-	get_tree().change_scene_to_file("res://scenes/level_select.tscn")
-
 func quit():
 	get_tree().quit()
 
-#ehelemals levels()
 func open_level_select():
 	get_tree().change_scene_to_file("res://scenes/level_select.tscn")
 
@@ -20,6 +11,18 @@ func on_survey_pressed():
 
 
 func sandbox():
-	game.current_chapter = levels.chapters.size() - 1
-	game.current_level = levels.chapters[game.current_chapter].levels.size() -1
-	get_tree().change_scene_to_file("res://scenes/main.tscn")
+	for i in range(levels.chapters.size()):
+		if levels.chapters[i].slug == "sandbox":
+			game.current_chapter = i
+			game.current_level = 0
+			get_tree().change_scene_to_file("res://scenes/main.tscn")
+			return
+
+
+func _on_reset_progress_pressed():
+	$ResetConfirm.popup_centered()
+
+
+func _on_reset_confirm_confirmed():
+	game.reset_progress()
+	game.notify("All progress has been reset.", self)

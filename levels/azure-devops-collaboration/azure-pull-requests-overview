@@ -1,0 +1,27 @@
+title = Pull requests, reviewers, and optional work-item links
+mode = platform_theory
+
+[diagram]
+
+[code]
+   feature branch (Azure Repos)
+              │
+              ▼
+   CREATE PR ──► reviewers · policies · builds
+              │
+              │  optional: link work items (traceability)
+              ▼
+   complete PR ──► merge types allowed by policy
+[/code]
+
+[center][color=#0078d4]required reviewers · optional path filters[/color][/center]
+
+[description]
+
+[b]Pull requests[/b] in Azure Repos behave like other forges: diff, threads, iteration on pushes, and merge when policies pass. [b]Branch policies[/b] can require reviewers, successful builds, linked work items, and comment resolution—stack policies carefully so contributors understand the minimum bar.
+
+[b]Work item links:[/b] associating a PR with Boards items helps release notes and audits; requiring links can slow tiny fixes—teams sometimes exempt hotfix branches.
+
+[b]Iteration fields:[/b] Azure DevOps tracks iteration paths separately from Git branches—keep naming aligned to reduce confusion in sprint reviews.
+
+[b]Takeaway:[/b] PRs are the negotiation layer; policies encode what “done” means before Git moves the protected ref.

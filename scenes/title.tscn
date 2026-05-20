@@ -50,9 +50,17 @@ text = "Levels"
 layout_mode = 2
 text = "Sandbox"
 
+[node name="ResetProgressButton" type="Button" parent="VBoxContainer"]
+layout_mode = 2
+text = "Reset progress"
+
 [node name="Button2" type="Button" parent="VBoxContainer"]
 layout_mode = 2
 text = "Quit"
+
+[node name="ResetConfirm" type="ConfirmationDialog" parent="."]
+title = "Reset progress"
+dialog_text = "Clear all progress (solved levels, CLI badges, hints, and card history)? This cannot be undone."
 
 [node name="Sprite2D" type="Sprite2D" parent="."]
 
@@ -63,4 +71,6 @@ texture = ExtResource("2")
 
 [connection signal="pressed" from="VBoxContainer/Button" to="." method="open_level_select"]
 [connection signal="pressed" from="VBoxContainer/Button3" to="." method="sandbox"]
+[connection signal="pressed" from="VBoxContainer/ResetProgressButton" to="." method="_on_reset_progress_pressed"]
 [connection signal="pressed" from="VBoxContainer/Button2" to="." method="quit"]
+[connection signal="confirmed" from="ResetConfirm" to="." method="_on_reset_confirm_confirmed"]

@@ -1,0 +1,36 @@
+title = Azure Pipelines: YAML, stages, agents, and environments
+mode = platform_theory
+
+[diagram]
+
+[code]
+   azure-pipelines.yml (in repo)
+              │
+              ▼
+        stages / jobs / steps
+              │
+     ┌────────┴────────┐
+     ▼                 ▼
+ microsoft-hosted   self-hosted
+ agent pools        agent pools
+     │                 │
+     └────────┬────────┘
+              ▼
+   environments (approvals, checks) → deploy
+[/code]
+
+[center][color=#0078d4]templates · extends · service connections[/color][/center]
+
+[description]
+
+[b]Azure Pipelines[/b] defines CI/CD in YAML checked into the repo (or classic UI definitions in older setups). [b]Stages[/b] group jobs; [b]jobs[/b] target agent pools; [b]steps[/b] run tasks (bash, PowerShell, marketplace tasks). Conditional logic, templates, and parameterization reduce copy-paste across microservices.
+
+[b]Agents:[/b] Microsoft-hosted agents are convenient but generic; self-hosted pools give GPU access, private networks, and compliance boundaries at the cost of patching and trust. Agent authentication uses keys or PAT-like tokens—rotate on departure.
+
+[b]Environments and deployments:[/b] environments wrap deployment targets with approvals, branch filters, and checks (invoke REST gates, delay, etc.). They map human release process onto pipeline YAML.
+
+[b]Service connections:[/b] store cloud credentials for deploy steps—scope narrowly (subscription + resource group) and audit usage.
+
+[b]Artifacts:[/b] pipeline runs publish packages, symbols, and test results consumed by releases or other pipelines—set retention to control cost.
+
+[b]Takeaway:[/b] treat agents like cattle in the cloud but pets on-prem: both need health checks, capacity planning, and secret hygiene.

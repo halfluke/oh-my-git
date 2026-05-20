@@ -1,0 +1,37 @@
+title = Bitbucket Pipelines and CI/CD on Atlassian stack
+mode = platform_theory
+
+[diagram]
+
+[code]
+   bitbucket-pipelines.yml
+            │
+            ▼
+     ┌──────────────┐
+     │ step: build  │ docker image
+     └──────┬───────┘
+            ▼
+     ┌──────────────┐
+     │ step: test   │ caches · artifacts
+     └──────┬───────┘
+            ▼
+     ┌──────────────┐
+     │ step: deploy │ (manual gate / env)
+     └──────────────┘
+[/code]
+
+[center][color=#0052cc]minutes quotas · Docker service containers[/color][/center]
+
+[description]
+
+[b]Bitbucket Pipelines[/b] runs containerized steps declared in YAML at the repository root. Each step picks a Docker image, runs script sections, and can declare caches, artifacts, and deployment steps. Shared infrastructure enforces minute quotas—optimize with dependency caching and parallel steps where supported.
+
+[b]Services:[/b] auxiliary containers (databases, emulators) can run beside the main step container for integration tests—similar in spirit to GitHub Actions service containers.
+
+[b]Deployments:[/b] map steps to environments with manual gates for production; track release history alongside Jira versions when integrated.
+
+[b]Secrets:[/b] repository and deployment variables should be scoped narrowly; rotation requires coordination with anyone embedding tokens in YAML (prefer injected vars over literals).
+
+[b]Alternatives:[/b] many teams attach external CI (Bamboo, Circle, Jenkins) via webhooks while keeping PRs in Bitbucket—document the source of truth for green checks.
+
+[b]Takeaway:[/b] treat pipeline YAML like application code: review changes, pin images, and test forks from untrusted contributors in isolated workspaces.

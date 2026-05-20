@@ -3,6 +3,8 @@ extends Control
 var card_store = {}
 var cards
 var card_radius = 1500
+var _arrange_token := 0
+var _card_tween: Tween
 
 func _ready():
 	load_card_store()
@@ -47,7 +49,14 @@ func draw_card(card):
 	add_child(new_card)
 	arrange_cards()
 	
+func _cancel_card_tweens() -> void:
+	_arrange_token += 1
+	if _card_tween and _card_tween.is_valid():
+		_card_tween.kill()
+		_card_tween = null
+
 func draw(ids):
+	_cancel_card_tweens()
 	for card in get_tree().get_nodes_in_group("cards"):
 		card.queue_free()
 	if ids.is_empty():
@@ -62,6 +71,7 @@ func _finish_draw(ids):
 		game.notify("These are your cards! Drag them to highlighted areas to play them!", self, "cards")
 	
 func arrange_cards():
+	var token = _arrange_token
 	var t = Timer.new()
 	t.wait_time = 0.05
 	t.one_shot = true
@@ -69,8 +79,19 @@ func arrange_cards():
 	t.start()
 	await t.timeout
 	t.queue_free()
+	if token != _arrange_token:
+		return
 	
-	var amount_cards = get_tree().get_nodes_in_group("cards").size()
+	var card_nodes: Array = get_tree().get_nodes_in_group("cards")
+	var amount_cards = card_nodes.size()
+	if amount_cards == 0:
+		return
+	
+	if _card_tween and _card_tween.is_valid():
+		_card_tween.kill()
+	_card_tween = create_tween()
+	_card_tween.set_parallel(true)
+	
 	var total_angle = min(35, 45.0/7*amount_cards)
 	var angle_between_cards = 0
 	if amount_cards > 1:
@@ -79,7 +100,9 @@ func arrange_cards():
 		total_angle = 0
 		
 	var current_angle = -total_angle/2
-	for card in get_tree().get_nodes_in_group("cards"):
+	for card in card_nodes:
+		if not is_instance_valid(card):
+			continue
 		var target_position = Vector2(size.x/2, size.y + card_radius)
 		var target_rotation = current_angle
 		var translation_vec = Vector2(0,-card_radius).rotated(current_angle/180.0*PI)
@@ -88,12 +111,12 @@ func arrange_cards():
 		card._home_position = target_position
 		card._home_rotation = target_rotation
 		
-		var tween = get_tree().create_tween()
-		tween.tween_property(card, "position", target_position, 0.5)
-		tween.tween_property(card, "rotation_degrees", target_rotation, 0.5)
+		_card_tween.tween_property(card, "position", target_position, 0.5)
+		_card_tween.tween_property(card, "rotation_degrees", target_rotation, 0.5)
 		
 func redraw_all_cards():
 	game.energy = 5
+	_cancel_card_tweens()
 	
 	for card in get_tree().get_nodes_in_group("cards"):
 		card.queue_free()
